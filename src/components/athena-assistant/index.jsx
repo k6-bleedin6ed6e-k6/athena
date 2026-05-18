@@ -75,7 +75,7 @@ export default function AthenaAssistant({ currentEvent, currentLesson, onEventHa
   const [isTyping, setIsTyping] = useState(false)
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
-  const { ask, isOnline } = useAthena()
+  const { ask } = useAthena()
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -147,10 +147,6 @@ export default function AthenaAssistant({ currentEvent, currentLesson, onEventHa
         <div className="aa__brand">
           <span className="aa__owl">🦉</span>
           <span className="aa__name">ATHENA</span>
-        </div>
-        <div className="aa__status">
-          <span className={`aa__status-dot${isOnline ? '' : ' aa__status-dot--offline'}`} />
-          <span className="aa__status-label">{isOnline ? 'online' : 'offline'}</span>
         </div>
       </div>
 
