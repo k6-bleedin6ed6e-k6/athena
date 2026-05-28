@@ -4,6 +4,26 @@ import { highlight } from '../../../utils/highlight'
 import { playChime } from '../../../utils/sound'
 import './code-bootcamp-sim.css'
 
+const STORAGE_KEY = id => `athena_cb_${id}`
+
+function loadSession(lesson) {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY(lesson.id))
+    if (!raw) return null
+    const saved = JSON.parse(raw)
+    if (saved.stepIndex >= lesson.steps.length) return null
+    return saved
+  } catch { return null }
+}
+
+function saveSession(lessonId, stepIndex, files) {
+  try { localStorage.setItem(STORAGE_KEY(lessonId), JSON.stringify({ stepIndex, files })) } catch {}
+}
+
+function clearSession(lessonId) {
+  try { localStorage.removeItem(STORAGE_KEY(lessonId)) } catch {}
+}
+
 /* ─── Editor: syntax-highlighted overlay ─── */
 function Editor({ value, onChange, readOnly }) {
   const textareaRef = useRef(null)
@@ -180,21 +200,22 @@ function KanbanDemo({ mode }) {
 /* ─── Main Lesson Engine ─── */
 export default function CodeBootcampSim({ onClose, onAthenaEvent }) {
   const lesson = shiptivitasLesson
+  const saved  = loadSession(lesson)
 
-  const [stepIndex, setStepIndex] = useState(0)
+  const [stepIndex, setStepIndex] = useState(saved?.stepIndex ?? 0)
   const [files, setFiles] = useState(() => {
-    const copy = {}
-    Object.keys(lesson.files).forEach(k => {
-      copy[k] = lesson.files[k].initial
-    })
-    return copy
+    const defaults = {}
+    Object.keys(lesson.files).forEach(k => { defaults[k] = lesson.files[k].initial })
+    return saved?.files ? { ...defaults, ...saved.files } : defaults
   })
-  const [openFile, setOpenFile] = useState('board.js')
-  const [validation, setValidation] = useState('idle')
-  const [attempts, setAttempts] = useState(0)
-  const [showHint, setShowHint] = useState(false)
+  const [openFile,     setOpenFile]     = useState('board.js')
+  const [validation,   setValidation]   = useState('idle')
+  const [attempts,     setAttempts]     = useState(0)
+  const [showHint,     setShowHint]     = useState(false)
   const [showSolution, setShowSolution] = useState(false)
-  const firedRef = useRef(new Set())
+  const [confirmReset, setConfirmReset] = useState(false)
+  const firedRef       = useRef(new Set())
+  const resetTimerRef  = useRef(null)
 
   const step = lesson.steps[stepIndex]
   const isFirst = stepIndex === 0
@@ -258,8 +279,14 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent }) {
     setFiles(prev => ({ ...prev, [target]: lesson.files[target].solution }))
     setShowSolution(false)
     setValidation('pass')
-    fire('step-advanced', step.title)
+    const isLastStep = stepIndex === lesson.steps.length - 1
+    fire(isLastStep ? 'lesson-complete' : 'step-advanced', step.title)
   }
+
+  // Persist session on every meaningful change
+  useEffect(() => {
+    saveSession(lesson.id, stepIndex, files)
+  }, [stepIndex, files])
 
   useEffect(() => {
     if (step.targetFile) setOpenFile(step.targetFile)
@@ -268,6 +295,27 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent }) {
   useEffect(() => {
     fire('bootcamp-opened')
   }, [])
+
+  function handleRestart() {
+    if (!confirmReset) {
+      setConfirmReset(true)
+      resetTimerRef.current = setTimeout(() => setConfirmReset(false), 4000)
+      return
+    }
+    clearTimeout(resetTimerRef.current)
+    clearSession(lesson.id)
+    const defaults = {}
+    Object.keys(lesson.files).forEach(k => { defaults[k] = lesson.files[k].initial })
+    setFiles(defaults)
+    setStepIndex(0)
+    setOpenFile('board.js')
+    setValidation('idle')
+    setAttempts(0)
+    setShowHint(false)
+    setShowSolution(false)
+    setConfirmReset(false)
+    firedRef.current = new Set()
+  }
 
   const canAdvance = validation === 'pass'
   const hintVisible = showHint || (validation === 'fail' && attempts >= 2 && !showSolution)
@@ -291,6 +339,17 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent }) {
               title={s.title}
             />
           ))}
+        </div>
+        <div className="cb-sim__top-actions">
+          {confirmReset ? (
+            <>
+              <span className="cb-sim__reset-prompt">restart?</span>
+              <button className="cb-sim__reset-confirm" onClick={handleRestart}>yes</button>
+              <button className="cb-sim__reset-cancel" onClick={() => { clearTimeout(resetTimerRef.current); setConfirmReset(false) }}>no</button>
+            </>
+          ) : (
+            <button className="cb-sim__restart" onClick={handleRestart} title="restart from beginning">↺</button>
+          )}
         </div>
         <button className="cb-sim__close" onClick={onClose} aria-label="close">×</button>
       </div>

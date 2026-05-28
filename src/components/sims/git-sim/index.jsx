@@ -9,7 +9,26 @@ import {
 import { playChime } from '../../../utils/sound'
 import './git-sim.css'
 
-const LESSON_PROMPT = 'learner@athena:~/my-project'
+const LESSON_PROMPT  = 'learner@athena:~/my-project'
+const GIT_STORAGE_KEY = 'athena_git_session'
+
+function loadGitSession(lesson) {
+  try {
+    const raw = localStorage.getItem(GIT_STORAGE_KEY)
+    if (!raw) return null
+    const saved = JSON.parse(raw)
+    if (saved.stepIndex >= lesson.steps.length) return null
+    return saved
+  } catch { return null }
+}
+
+function saveGitSession(data) {
+  try { localStorage.setItem(GIT_STORAGE_KEY, JSON.stringify(data)) } catch {}
+}
+
+function clearGitSession() {
+  try { localStorage.removeItem(GIT_STORAGE_KEY) } catch {}
+}
 
 // ─── File Tree ────────────────────────────────────────────────────────────────
 function FileTree({ gs }) {
@@ -318,6 +337,12 @@ function handleOffScript(cmd, gs) {
       if (fname) return [RED(`cat: ${fname}: No such file or directory`)]
       return [RED('cat: missing operand')]
     }
+    if (prog === 'touch' || prog === 'nano' || prog === 'vim' || prog === 'vi' || prog === 'mkdir' || prog === 'rm') {
+      return [DIM(`${prog} unlocks in the sandbox — finish the lesson to access the free terminal`)]
+    }
+    if (prog === 'clear') return []
+    if (prog === 'echo') return [L(rest.join(' '))]
+    if (prog === 'help') return [DIM('git commands: init · status · add · commit · log · diff · branch · checkout')]
     return [RED(`bash: ${prog}: command not found`)]
   }
 
@@ -555,6 +580,50 @@ function SandboxTerminal({ lessonGitState }) {
         }
       })
       push(prompt_str(), cmd, [])
+      return
+    }
+
+    // ── mkdir ─────────────────────────────────────────────────────────────────
+    if (prog === 'mkdir') {
+      const dirname = rest[0]
+      if (!dirname) { push(prompt_str(), cmd, [RED('mkdir: missing operand')]); return }
+      push(prompt_str(), cmd, [])
+      return
+    }
+
+    // ── rm ────────────────────────────────────────────────────────────────────
+    if (prog === 'rm') {
+      const target = rest.find(a => !a.startsWith('-'))
+      if (!target) { push(prompt_str(), cmd, [RED('rm: missing operand')]); return }
+      const exists = gs.fileContents?.[target] !== undefined ||
+                     gs.untracked.includes(target) ||
+                     gs.staged.includes(target) ||
+                     gs.modified.includes(target)
+      if (!exists) { push(prompt_str(), cmd, [RED(`rm: cannot remove '${target}': No such file or directory`)]); return }
+      setSandboxGs(prev => {
+        const newContents = { ...prev.fileContents }
+        delete newContents[target]
+        return {
+          ...prev,
+          fileContents: newContents,
+          untracked: prev.untracked.filter(f => f !== target),
+          modified:  prev.modified.filter(f  => f !== target),
+          staged:    prev.staged.filter(f    => f !== target),
+        }
+      })
+      push(prompt_str(), cmd, [])
+      return
+    }
+
+    // ── clear ─────────────────────────────────────────────────────────────────
+    if (prog === 'clear') {
+      setHistory([])
+      return
+    }
+
+    // ── echo ──────────────────────────────────────────────────────────────────
+    if (prog === 'echo') {
+      push(prompt_str(), cmd, [L(rest.join(' '))])
       return
     }
 
@@ -836,24 +905,54 @@ function SandboxTerminal({ lessonGitState }) {
 // ─── Main sim ─────────────────────────────────────────────────────────────────
 export default function GitSim({ onClose, onAthenaEvent }) {
   const lesson = gitBasicsLesson
-  const [stepIndex,   setStepIndex]   = useState(0)
-  const [gitState,    setGitState]    = useState({ ...lesson.initialState })
-  const [history,     setHistory]     = useState([])
-  const [input,       setInput]       = useState('')
-  const [validation,  setValidation]  = useState('idle')
-  const [note,        setNote]        = useState(null)
-  const [showHint,    setShowHint]    = useState(false)
-  const [attempts,    setAttempts]    = useState(0)
-  const [sandboxMode, setSandboxMode] = useState(false)
-  const bottomRef = useRef(null)
-  const inputRef  = useRef(null)
-  const firedRef  = useRef(new Set())
+  const saved  = loadGitSession(lesson)
+
+  const [stepIndex,    setStepIndex]    = useState(saved?.stepIndex   ?? 0)
+  const [gitState,     setGitState]     = useState(saved?.gitState    ?? { ...lesson.initialState })
+  const [history,      setHistory]      = useState(saved?.history     ?? [])
+  const [input,        setInput]        = useState('')
+  const [validation,   setValidation]   = useState('idle')
+  const [note,         setNote]         = useState(null)
+  const [showHint,     setShowHint]     = useState(false)
+  const [attempts,     setAttempts]     = useState(0)
+  const [sandboxMode,  setSandboxMode]  = useState(saved?.sandboxMode ?? false)
+  const [confirmReset, setConfirmReset] = useState(false)
+  const bottomRef    = useRef(null)
+  const inputRef     = useRef(null)
+  const firedRef     = useRef(new Set())
+  const resetTimerRef = useRef(null)
 
   const step   = lesson.steps[stepIndex]
   const isLast = stepIndex === lesson.steps.length - 1
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [history])
   useEffect(() => { inputRef.current?.focus() }, [stepIndex])
+
+  // Persist session on every meaningful change
+  useEffect(() => {
+    saveGitSession({ stepIndex, gitState, history, sandboxMode })
+  }, [stepIndex, gitState, history, sandboxMode])
+
+  function handleRestart() {
+    if (!confirmReset) {
+      setConfirmReset(true)
+      resetTimerRef.current = setTimeout(() => setConfirmReset(false), 4000)
+      return
+    }
+    clearTimeout(resetTimerRef.current)
+    clearGitSession()
+    setStepIndex(0)
+    setGitState({ ...lesson.initialState })
+    setHistory([])
+    setInput('')
+    setValidation('idle')
+    setNote(null)
+    setShowHint(false)
+    setAttempts(0)
+    setSandboxMode(false)
+    setConfirmReset(false)
+    firedRef.current = new Set()
+  }
 
   function fire(event, context = '') {
     const key = `${event}:${stepIndex}`
@@ -943,6 +1042,17 @@ export default function GitSim({ onClose, onAthenaEvent }) {
               title={s.title}
             />
           ))}
+        </div>
+        <div className="gs-sim__top-actions">
+          {confirmReset ? (
+            <>
+              <span className="gs-sim__reset-prompt">restart?</span>
+              <button className="gs-sim__reset-confirm" onClick={handleRestart}>yes</button>
+              <button className="gs-sim__reset-cancel" onClick={() => { clearTimeout(resetTimerRef.current); setConfirmReset(false) }}>no</button>
+            </>
+          ) : (
+            <button className="gs-sim__restart" onClick={handleRestart} title="restart from beginning">↺</button>
+          )}
         </div>
         <button className="gs-sim__close" onClick={onClose} aria-label="close">×</button>
       </div>

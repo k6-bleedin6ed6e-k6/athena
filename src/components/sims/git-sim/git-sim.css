@@ -55,8 +55,58 @@
   background: #da3633; color: #fff;
   font-size: 15px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 .gs-sim__close:hover { background: #e5453d; }
+
+.gs-sim__top-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 8px;
+}
+
+.gs-sim__restart {
+  background: none;
+  border: 1px solid #30363d;
+  border-radius: 5px;
+  color: #484f58;
+  font-size: 14px;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.gs-sim__restart:hover { color: #8b949e; border-color: #484f58; }
+
+.gs-sim__reset-prompt {
+  font-size: 11px;
+  color: #484f58;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.gs-sim__reset-confirm,
+.gs-sim__reset-cancel {
+  background: none;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  font-size: 11px;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-family: system-ui, -apple-system, sans-serif;
+  transition: all 0.12s;
+}
+
+.gs-sim__reset-confirm { color: #f85149; border-color: #3d1f1f; }
+.gs-sim__reset-confirm:hover { background: rgba(248,81,73,0.1); }
+
+.gs-sim__reset-cancel { color: #484f58; }
+.gs-sim__reset-cancel:hover { color: #8b949e; }
 
 /* ─── Workspace ─── */
 .gs-sim__workspace {
@@ -204,9 +254,9 @@
 }
 
 .gs-sim__instruction {
-  font-size: 12.5px;
-  line-height: 1.7;
-  color: #8b949e;
+  font-size: 13px;
+  line-height: 1.75;
+  color: #c9d1d9;
   white-space: pre-wrap;
 }
 
@@ -673,7 +723,7 @@
 
 /* ─── Sandbox wrap ─── */
 .gs-sim__sandbox-wrap {
-  height: 220px;
+  height: 300px;
   flex-shrink: 0;
   border-top: 2px solid var(--athena-gold, #d4af37);
 }

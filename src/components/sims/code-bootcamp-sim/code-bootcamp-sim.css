@@ -74,11 +74,58 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
-.cb-sim__close:hover {
-  background: #d55;
+.cb-sim__close:hover { background: #d55; }
+
+.cb-sim__top-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 8px;
 }
+
+.cb-sim__restart {
+  background: none;
+  border: 1px solid #3a3a3a;
+  border-radius: 5px;
+  color: #666;
+  font-size: 14px;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.cb-sim__restart:hover { color: #aaa; border-color: #555; }
+
+.cb-sim__reset-prompt {
+  font-size: 11px;
+  color: #888;
+}
+
+.cb-sim__reset-confirm,
+.cb-sim__reset-cancel {
+  background: none;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  font-size: 11px;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.12s;
+}
+
+.cb-sim__reset-confirm { color: #c47777; border-color: #5a3030; }
+.cb-sim__reset-confirm:hover { background: rgba(196,119,119,0.1); }
+
+.cb-sim__reset-cancel { color: #666; }
+.cb-sim__reset-cancel:hover { color: #aaa; }
 
 /* ─── Workspace ─── */
 .cb-sim__workspace {
@@ -299,9 +346,9 @@
 }
 
 .cb-sim__step-instruction {
-  font-size: 12.5px;
-  line-height: 1.65;
-  color: #c0bbb5;
+  font-size: 13px;
+  line-height: 1.72;
+  color: #d4d0cc;
   white-space: pre-wrap;
   margin: 0;
 }
