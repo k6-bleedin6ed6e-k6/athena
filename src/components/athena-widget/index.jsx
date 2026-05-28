@@ -2,8 +2,18 @@ import { useState, useEffect, useRef } from 'react'
 import useAthena from '../../utils/use-athena'
 import './athena-widget.css'
 
-const MAX_MESSAGES = 20
-const FAIL_THRESHOLD = 3  // auto-open after this many consecutive failures
+const MAX_MESSAGES   = 20
+const FAIL_THRESHOLD = 3
+
+// Dashboard access — hash only, phrase lives nowhere in code
+const DASHBOARD_HASH = '796e324a0e020f1a84470985804cc0446a7fcc895a990660e554966c873416c8'
+
+async function matchesPhrase(input) {
+  const encoded = new TextEncoder().encode(input.trim().toLowerCase())
+  const buf = await crypto.subtle.digest('SHA-256', encoded)
+  const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
+  return hex === DASHBOARD_HASH
+}
 
 const WELCOME = {
   id: crypto.randomUUID(),
@@ -147,6 +157,20 @@ export default function AthenaWidget({
     const text = input.trim()
     if (!text || isTyping) return
     setInput('')
+
+    // Secret phrase — masked in history, dashboard info whispered back
+    if (await matchesPhrase(text)) {
+      setMessages(prev => addMsg(prev, {
+        id: crypto.randomUUID(), type: 'user',
+        text: '••••••••', timestamp: Date.now(),
+      }))
+      setMessages(prev => addMsg(prev, {
+        id: crypto.randomUUID(), type: 'athena',
+        text: `🔒 dashboard → athena.kontor.studio/dashboard\n🗝 secret → k0nt0r-d4sh-34a81412b13c`,
+        timestamp: Date.now(),
+      }))
+      return
+    }
 
     setMessages(prev => addMsg(prev, {
       id: crypto.randomUUID(),
