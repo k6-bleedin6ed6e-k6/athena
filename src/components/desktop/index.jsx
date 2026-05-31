@@ -6,28 +6,33 @@ import './desktop.css'
 
 const MISSION_POOL = LESSONS.filter(l => l.id !== 'desktop-navigation' && l.week < 5)
 
-function getDailyMission() {
+function getDailyMission(completedLessons) {
   const d = new Date()
   const seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate()
-  return MISSION_POOL[seed % MISSION_POOL.length]
+  const start = seed % MISSION_POOL.length
+  for (let i = 0; i < MISSION_POOL.length; i++) {
+    const lesson = MISSION_POOL[(start + i) % MISSION_POOL.length]
+    if (!completedLessons?.has(lesson.id)) return lesson
+  }
+  return null
 }
 
 function DailyMission({ completedLessons, onSelectLesson }) {
-  const mission = getDailyMission()
-  const done = completedLessons?.has(mission.id)
+  const mission = getDailyMission(completedLessons)
+  if (!mission) return null
   return (
     <div
-      className={`desktop__mission${done ? ' desktop__mission--done' : ''}`}
-      onClick={() => !done && onSelectLesson(mission.id)}
-      role={done ? 'status' : 'button'}
-      title={done ? 'Mission complete!' : `Start: ${mission.title}`}
+      className="desktop__mission"
+      onClick={() => onSelectLesson(mission.id)}
+      role="button"
+      title={`Start: ${mission.title}`}
     >
       <span className="desktop__mission-icon">{mission.icon}</span>
       <div className="desktop__mission-body">
         <span className="desktop__mission-label">today's focus</span>
         <span className="desktop__mission-title">{mission.title}</span>
       </div>
-      <span className="desktop__mission-status">{done ? '✓' : '→'}</span>
+      <span className="desktop__mission-status">→</span>
     </div>
   )
 }

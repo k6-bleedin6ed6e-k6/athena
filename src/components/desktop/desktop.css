@@ -30,8 +30,6 @@
 }
 
 .desktop__mission:hover        { border-color: var(--athena-gold); background: rgba(201,168,76,0.1); }
-.desktop__mission--done        { cursor: default; border-color: rgba(107,142,107,0.5); background: rgba(107,142,107,0.08); }
-.desktop__mission--done:hover  { border-color: rgba(107,142,107,0.5); background: rgba(107,142,107,0.08); }
 
 .desktop__mission-icon   { font-size: 22px; line-height: 1; flex-shrink: 0; }
 
@@ -52,8 +50,6 @@
   opacity: 0.7;
 }
 
-.desktop__mission--done .desktop__mission-label { color: #6b8e6b; }
-
 .desktop__mission-title {
   font-size: 13px;
   font-weight: 600;
@@ -70,8 +66,6 @@
   flex-shrink: 0;
   opacity: 0.8;
 }
-
-.desktop__mission--done .desktop__mission-status { color: #6b8e6b; }
 
 /* ── Week sections ───────────────────────────────────────────────────────── */
 .desktop__weeks {
