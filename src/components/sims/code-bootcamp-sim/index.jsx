@@ -102,7 +102,6 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent, onSimContext }
   })
   const [validation,   setValidation]   = useState('idle')
   const [attempts,     setAttempts]     = useState(0)
-  const [showHint,     setShowHint]     = useState(false)
   const [showSolution, setShowSolution] = useState(false)
   const [confirmReset, setConfirmReset] = useState(false)
   const [pyOutput,     setPyOutput]     = useState(null)
@@ -153,7 +152,6 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent, onSimContext }
       setStepIndex(next)
       setValidation('idle')
       setAttempts(0)
-      setShowHint(false)
       setShowSolution(false)
       setPyOutput(null)
     }
@@ -164,7 +162,6 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent, onSimContext }
       setStepIndex(i => i - 1)
       setValidation('idle')
       setAttempts(0)
-      setShowHint(false)
       setShowSolution(false)
     }
   }
@@ -201,7 +198,6 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent, onSimContext }
     setStepIndex(0)
     setValidation('idle')
     setAttempts(0)
-    setShowHint(false)
     setShowSolution(false)
     setConfirmReset(false)
     setPyOutput(null)
@@ -218,7 +214,7 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent, onSimContext }
   }, [])
 
   const canAdvance  = validation === 'pass'
-  const hintVisible = stepIndex === 0 || showHint || (validation === 'fail' && attempts >= 2 && !showSolution)
+  const hintVisible = !!step.hint
 
   return (
     <div className="cb-sim">

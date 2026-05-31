@@ -907,9 +907,12 @@ function SandboxTerminal({ lessonGitState }) {
         <div className="gs-sandbox__terminal">
           <div className="gs-sandbox__history">
             <div className="gs-sandbox__welcome">
-              <span className="gs-sandbox__welcome-line">✓ lesson complete — sandbox unlocked</span>
+              <span className="gs-sandbox__welcome-line">✓ zero to ship — sandbox unlocked</span>
               <span className="gs-sandbox__welcome-line gs-sandbox__welcome-dim">
-                touch script.py · nano script.py · python script.py · git add · git commit · git clone any/public-repo
+                try: git clone https://github.com/k6-bleedin6ed6e-k6/grades
+              </span>
+              <span className="gs-sandbox__welcome-line gs-sandbox__welcome-dim">
+                nano · touch · python · git add · git commit · git log
               </span>
             </div>
             {history.map((entry, i) => (
@@ -953,8 +956,8 @@ export default function GitSim({ onClose, onAthenaEvent, simContext }) {
   const lesson = gitBasicsLesson
   const saved  = loadGitSession(lesson)
 
-  const [stepIndex,    setStepIndex]    = useState(saved?.stepIndex   ?? 0)
-  const [gitState,     setGitState]     = useState(() => {
+  const [stepIndex,      setStepIndex]      = useState(saved?.stepIndex   ?? 0)
+  const [gitState,       setGitState]       = useState(() => {
     const base = saved?.gitState ?? { ...lesson.initialState }
     const script = simContext?.pythonScript
     if (script && !base.fileContents?.[script.name]) {
@@ -966,14 +969,18 @@ export default function GitSim({ onClose, onAthenaEvent, simContext }) {
     }
     return base
   })
-  const [history,      setHistory]      = useState(saved?.history     ?? [])
-  const [input,        setInput]        = useState('')
-  const [validation,   setValidation]   = useState('idle')
-  const [note,         setNote]         = useState(null)
-  const [showHint,     setShowHint]     = useState(false)
-  const [attempts,     setAttempts]     = useState(0)
-  const [sandboxMode,  setSandboxMode]  = useState(saved?.sandboxMode ?? false)
-  const [confirmReset, setConfirmReset] = useState(false)
+  const [history,        setHistory]        = useState(saved?.history     ?? [])
+  const [input,          setInput]          = useState('')
+  const [validation,     setValidation]     = useState('idle')
+  const [note,           setNote]           = useState(null)
+  const [showHint,       setShowHint]       = useState(false)
+  const [attempts,       setAttempts]       = useState(0)
+  const [sandboxMode,    setSandboxMode]    = useState(saved?.sandboxMode ?? false)
+  const [confirmReset,   setConfirmReset]   = useState(false)
+  const [signupUsername, setSignupUsername] = useState(saved?.gitState?.githubUsername || '')
+  const [signupEmail,    setSignupEmail]    = useState('')
+  const [signupPassword, setSignupPassword] = useState('')
+  const [signupDone,     setSignupDone]     = useState(!!saved?.gitState?.githubUsername)
   const bottomRef    = useRef(null)
   const inputRef     = useRef(null)
   const firedRef     = useRef(new Set())
@@ -1008,6 +1015,10 @@ export default function GitSim({ onClose, onAthenaEvent, simContext }) {
     setAttempts(0)
     setSandboxMode(false)
     setConfirmReset(false)
+    setSignupUsername('')
+    setSignupEmail('')
+    setSignupPassword('')
+    setSignupDone(false)
     firedRef.current = new Set()
   }
 
@@ -1040,7 +1051,7 @@ export default function GitSim({ onClose, onAthenaEvent, simContext }) {
     setNote(null)
     setShowHint(false)
 
-    if (step.type === 'explainer' || step.type === 'ship-it') return
+    if (step.type === 'explainer' || step.type === 'ship-it' || step.type === 'github-signup') return
 
     const accepted = step.accepts(cmd)
 
@@ -1069,6 +1080,7 @@ export default function GitSim({ onClose, onAthenaEvent, simContext }) {
     if (next >= lesson.steps.length) return
     const effect = step.onAdvance?.()
     if (effect) applyEffect(effect)
+    if (isSignup && signupUsername) applyEffect({ githubUsername: signupUsername })
     setStepIndex(next)
     setValidation('idle')
     setAttempts(0)
@@ -1082,7 +1094,8 @@ export default function GitSim({ onClose, onAthenaEvent, simContext }) {
 
   const isExplainer = step.type === 'explainer'
   const isShipIt    = step.type === 'ship-it'
-  const canAdvance  = validation === 'pass' || isExplainer || isShipIt
+  const isSignup    = step.type === 'github-signup'
+  const canAdvance  = validation === 'pass' || isExplainer || isShipIt || (isSignup && signupDone)
 
   const viewFile    = step.viewFile || gitState.activeFile
   const viewContent = viewFile ? (gitState.fileContents?.[viewFile] ?? null) : null
@@ -1129,7 +1142,7 @@ export default function GitSim({ onClose, onAthenaEvent, simContext }) {
               ))}
               <div ref={bottomRef} />
             </div>
-            {!isExplainer && !isShipIt && (
+            {!isExplainer && !isShipIt && !isSignup && (
               <div className="gs-sim__input-row">
                 <span className="gs-sim__prompt">{LESSON_PROMPT}$</span>
                 <input
@@ -1171,10 +1184,66 @@ export default function GitSim({ onClose, onAthenaEvent, simContext }) {
           {isExplainer && step.githubView    && <GitHubView gs={gitState} />}
           {isExplainer && step.prView        && <PRView gs={gitState} />}
 
-          <div className="gs-sim__instruction">{step.instruction}</div>
+          <div className="gs-sim__instruction">
+            {step.instruction.replace(/\{username\}/g, gitState.githubUsername || signupUsername || 'your-username')}
+          </div>
 
-          {showHint && !isExplainer && !isShipIt && (
-            <div className="gs-sim__hint"><strong>hint:</strong> {step.hint}</div>
+          {isSignup && !signupDone && (
+            <div className="gs-sim__signup">
+              <div className="gs-sim__signup-field">
+                <label className="gs-sim__signup-label">Username</label>
+                <input
+                  className="gs-sim__signup-input"
+                  value={signupUsername}
+                  onChange={e => setSignupUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                  placeholder="your-username"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                />
+              </div>
+              <div className="gs-sim__signup-field">
+                <label className="gs-sim__signup-label">Email</label>
+                <input
+                  className="gs-sim__signup-input"
+                  type="email"
+                  value={signupEmail}
+                  onChange={e => setSignupEmail(e.target.value)}
+                  placeholder="you@example.com"
+                />
+              </div>
+              <div className="gs-sim__signup-field">
+                <label className="gs-sim__signup-label">Password</label>
+                <input
+                  className="gs-sim__signup-input"
+                  type="password"
+                  value={signupPassword}
+                  onChange={e => setSignupPassword(e.target.value)}
+                  placeholder="at least 8 characters"
+                />
+              </div>
+              <button
+                className="gs-sim__signup-btn"
+                onClick={() => { if (signupUsername && signupEmail && signupPassword.length >= 8) setSignupDone(true) }}
+                disabled={!signupUsername || !signupEmail || signupPassword.length < 8}
+              >
+                Create account →
+              </button>
+              {signupPassword && signupPassword.length < 8 && (
+                <span className="gs-sim__signup-hint">password must be at least 8 characters</span>
+              )}
+            </div>
+          )}
+          {isSignup && signupDone && (
+            <div className="gs-sim__signup-success">
+              ✓ Welcome to GitHub, @{signupUsername}
+              <span className="gs-sim__signup-success-sub">account created · ready to push</span>
+            </div>
+          )}
+
+          {showHint && !isExplainer && !isShipIt && !isSignup && (
+            <div className="gs-sim__hint"><strong>hint:</strong> <pre className="gs-sim__hint-pre">{step.hint}</pre></div>
           )}
           {note && <div className="gs-sim__note">{note}</div>}
           {validation === 'pass' && step.transitionNote && (
@@ -1182,20 +1251,20 @@ export default function GitSim({ onClose, onAthenaEvent, simContext }) {
           )}
 
           <div className="gs-sim__status">
-            {validation === 'pass'  && !isExplainer && <span className="gs-sim__status--pass">✓ correct</span>}
-            {validation === 'fail'  && <span className="gs-sim__status--fail">✗ not the expected command — check the hint</span>}
+            {validation === 'pass'  && !isExplainer && !isSignup && <span className="gs-sim__status--pass">✓ correct</span>}
+            {validation === 'fail'  && <span className="gs-sim__status--fail">✗ not the expected command</span>}
           </div>
 
           <div className="gs-sim__actions">
             {canAdvance && !isLast && (
               <button className="gs-sim__btn gs-sim__btn--primary" onClick={advance}>
-                {isExplainer ? 'got it →' : 'next →'}
+                {isExplainer || isSignup ? 'got it →' : 'next →'}
               </button>
             )}
             {isLast && <button className="gs-sim__btn gs-sim__btn--primary" onClick={onClose}>done ✓</button>}
-            {!canAdvance && !isShipIt && !isExplainer && (
-              <button className="gs-sim__btn" onClick={() => setShowHint(true)} disabled={showHint}>
-                {showHint ? 'hint shown' : 'show hint'}
+            {!canAdvance && !isShipIt && !isExplainer && !isSignup && (
+              <button className="gs-sim__btn" onClick={() => setShowHint(h => !h)}>
+                {showHint ? 'hide hint' : '💡 hint'}
               </button>
             )}
           </div>

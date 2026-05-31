@@ -149,6 +149,7 @@ export const gitBasicsLesson = {
     remote:     null,
     fileContents: { 'README.md': README_V1 },
     activeFile: 'README.md',
+    githubUsername: '',
   },
 
   steps: [
@@ -255,11 +256,52 @@ export const gitBasicsLesson = {
       getSideEffect: () => null,
     },
     {
-      id: 'sandbox-unlock',
-      type: 'ship-it',
-      title: 'you know git',
+      id: 'github-signup',
+      type: 'github-signup',
+      title: 'create your github account',
       instruction:
-        'That\'s the core loop: init · status · add · commit · log.\n\nEvery professional developer runs this cycle dozens of times a day. The only thing that changes is the commit message.\n\nThe sandbox terminal below is yours. Try git clone with any public GitHub repo — it fetches the real file tree.',
+        'Your commit is saved — on this machine.\n\nGitHub is where code lives online. It\'s free, it\'s what every team in the world uses, and your project will have a real URL you can share.\n\nFill in the form to create your account.',
+    },
+    {
+      id: 'git-remote-add',
+      type: 'command',
+      title: 'link to github',
+      instruction:
+        'Welcome to GitHub, @{username}.\n\nYour local project needs to know where its online home is. That address is called a remote.\n\nType: git remote add origin https://github.com/{username}/my-project.git',
+      hint: 'git remote add origin <url>\n\n"origin" is the standard name for your main remote.',
+      viewFile: 'README.md',
+      accepts: cmd => /^git remote add origin https:\/\/github\.com\/.+\/.+/.test(cmd.trim()),
+      getOutput: () => [],
+      getSideEffect: (gs, cmd) => {
+        const url = cmd.trim().split(/\s+/)[4] || 'https://github.com/your-username/my-project.git'
+        return { remote: { name: 'origin', url, pushed: false } }
+      },
+    },
+    {
+      id: 'git-push',
+      type: 'command',
+      title: 'ship it',
+      instruction:
+        'One command. Your commits leave this machine and land on GitHub — live, accessible from any browser, forever.\n\nType: git push -u origin main',
+      hint: 'git push -u origin main\n\nThe -u flag links your local branch to origin/main so next time you can just type git push.',
+      viewFile: 'README.md',
+      accepts: cmd => /^git push( -u| --set-upstream)? origin main$/.test(cmd.trim()),
+      getOutput: gs => [
+        L('Enumerating objects: 3, done.'),
+        L('Counting objects: 100% (3/3), done.'),
+        L('Writing objects: 100% (3/3), 312 bytes | 312.00 KiB/s, done.'),
+        GRN(`To ${gs.remote?.url || 'https://github.com/your-username/my-project.git'}`),
+        GRN(' * [new branch]      main -> main'),
+        L("branch 'main' set up to track 'origin/main'."),
+      ],
+      getSideEffect: gs => ({ remote: { ...gs.remote, pushed: true } }),
+    },
+    {
+      id: 'zero-to-ship',
+      type: 'ship-it',
+      title: 'zero to ship',
+      instruction:
+        'Your project is live at github.com/{username}/my-project.\n\nEvery developer in the world uses this exact workflow:\n\ninit · status · add · commit · push\n\nThe sandbox below is yours. Clone the grade calculator from Code Bootcamp and run it:\n\ngit clone https://github.com/k6-bleedin6ed6e-k6/grades',
     },
   ],
 }

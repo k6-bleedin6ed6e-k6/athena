@@ -55,7 +55,7 @@ The same learner. One story.
 A guided coding lesson where you write a Python grade calculator from scratch — step by step, running real code at each stage.
 
 **6 steps:**
-1. Print your name
+1. `print("Hello, I'm Alex")` — introduce print(), run it, see output
 2. Store your grades as a list
 3. Calculate the average using `sum()` and `len()`
 4. Turn it into a letter grade with if/elif/else
@@ -83,18 +83,25 @@ When the lesson completes, the script is passed to Git Basics as an untracked fi
 
 ## Week 5 — Git Basics
 
-A 22-step terminal simulator covering the full beginner Git workflow. Picks up where Code Bootcamp left off — your `grades.py` script is already in the project, untracked, waiting to be version-controlled.
+An 11-step terminal simulator: zero to ship. Picks up where Code Bootcamp left off — `grades.py` is already in the project, untracked, waiting to be version-controlled.
 
-| Part | What you learn |
+| Step | What you do |
 |---|---|
-| 1 — Local basics | `git init` · `git status` · `git add` · `git commit` · `git log` |
-| 2 — Remotes | `git remote add` · `git push` · `git pull` · `git clone` |
-| 3 — Branching | `git branch` · `git checkout` · `git merge` · merge conflicts |
-| 4 — PRs + Sandbox | Pull request flow · open sandbox terminal |
+| 1 | What is git? (explainer) |
+| 2 | `git init` |
+| 3 | `git status` — see the untracked file |
+| 4 | `git add grades.py` |
+| 5 | `git status` — verify it's staged |
+| 6 | `git commit -m "..."` |
+| 7 | `git log` |
+| 8 | Create your GitHub account (simulated signup form) |
+| 9 | `git remote add origin https://github.com/<username>/my-project.git` |
+| 10 | `git push -u origin main` |
+| 11 | Zero to ship — sandbox unlocked |
 
-The **sandbox terminal** is a real shell environment: create files with `touch`, edit them with `nano`/`vim`, run git commands on your actual changes, clone public GitHub repos, and execute Python scripts with `python script.py` — same Pyodide runtime as Code Bootcamp.
+The **sandbox terminal** opens after step 11. Try `git clone https://github.com/k6-bleedin6ed6e-k6/grades` to pull the exact grades.py script from Code Bootcamp. Also supports `touch`, `nano`/`vim`, `python script.py` (same Pyodide runtime), and free git commands.
 
-Validation is lenient-with-coaching: `git add .` is accepted but explains why naming files is better; weak commit messages are flagged.
+Validation is lenient-with-coaching: `git add .` is accepted with a note explaining why naming files is better; weak commit messages are flagged.
 
 ---
 
@@ -146,7 +153,7 @@ Set keys in `.env.local` to enable live AI. Athena works fully offline without t
 | AI runtime | Groq → OpenRouter → offline fallback |
 | Python execution | Pyodide (WebAssembly, runs in-browser) |
 | PWA | vite-plugin-pwa + Workbox |
-| Sync backend | Cloudflare Workers + D1 (see athena-worker) |
+| Sync backend | Cloudflare Pages Functions + D1 |
 
 No UI library dependencies. Every component is hand-rolled.
 
@@ -155,8 +162,9 @@ No UI library dependencies. Every component is hand-rolled.
 ## Getting Started
 
 ```bash
-# 1. Clone
+# 1. Clone (primary or mirror)
 git clone git@github.com:kwasikontor45/athena.git
+# or: git clone git@github-k6:k6-bleedin6ed6e-k6/athena.git
 cd athena
 
 # 2. Install
@@ -197,7 +205,7 @@ src/
 │       ├── shortcuts-sim/
 │       ├── password-sim/
 │       ├── code-bootcamp-sim/   # Python grade calculator + Pyodide execution
-│       ├── git-sim/             # 22-step Git terminal + sandbox
+│       ├── git-sim/             # 11-step Git terminal (zero to ship) + sandbox
 │       └── playground-sim/      # Free-roam launcher, all sims simultaneously
 ├── utils/
 │   ├── lessons.js            # 13 lessons, 5 weeks

@@ -1016,3 +1016,79 @@
   color: #484f58;
   font-size: 11px;
 }
+
+/* ─── GitHub signup form ─────────────────────────────────────────────────── */
+.gs-sim__signup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0;
+  padding: 14px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+}
+.gs-sim__signup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.gs-sim__signup-label {
+  font-size: 11px;
+  color: #8b949e;
+  font-weight: 500;
+}
+.gs-sim__signup-input {
+  background: #010409;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  color: #c9d1d9;
+  font-size: 13px;
+  font-family: inherit;
+  padding: 6px 8px;
+  outline: none;
+}
+.gs-sim__signup-input:focus { border-color: #388bfd; }
+.gs-sim__signup-btn {
+  margin-top: 4px;
+  background: #238636;
+  border: 1px solid #2ea043;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.gs-sim__signup-btn:hover:not(:disabled) { background: #2ea043; }
+.gs-sim__signup-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.gs-sim__signup-hint {
+  font-size: 11px;
+  color: #f85149;
+}
+.gs-sim__signup-success {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 12px 0;
+  padding: 12px 14px;
+  background: rgba(35, 134, 54, 0.15);
+  border: 1px solid #2ea043;
+  border-radius: 6px;
+  color: #3fb950;
+  font-size: 13px;
+  font-weight: 500;
+}
+.gs-sim__signup-success-sub {
+  font-size: 11px;
+  color: #8b949e;
+  font-weight: 400;
+}
+.gs-sim__hint-pre {
+  margin: 6px 0 0;
+  font-family: inherit;
+  font-size: 12px;
+  color: #ccc;
+  white-space: pre-wrap;
+}
