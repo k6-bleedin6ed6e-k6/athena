@@ -1,4 +1,5 @@
 .fes {
+  position: relative;
   width: 100%;
   height: 100%;
   background: var(--athena-bg-panel);
@@ -376,4 +377,65 @@
   color: var(--athena-gold, #d4af37);
   text-align: center;
   padding: 6px;
+}
+
+/* ─── File viewer modal ─────────────────────────────────────────────────── */
+.fes__file-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  border-radius: var(--athena-radius-lg);
+}
+.fes__file-modal {
+  background: var(--athena-bg-surface, #1a1a1a);
+  border: 1px solid var(--athena-gold-border, #3a3010);
+  border-radius: 8px;
+  width: 480px;
+  max-width: 90%;
+  max-height: 70%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.fes__file-modal-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--athena-bg-panel, #141414);
+  border-bottom: 1px solid var(--athena-gold-border, #3a3010);
+  flex-shrink: 0;
+}
+.fes__file-modal-icon { font-size: 14px; }
+.fes__file-modal-name {
+  flex: 1;
+  font-size: 13px;
+  color: #ccc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fes__file-modal-close {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+.fes__file-modal-close:hover { color: #fff; }
+.fes__file-modal-content {
+  margin: 0;
+  padding: 16px;
+  font-size: 13px;
+  color: #ccc;
+  line-height: 1.6;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-family: inherit;
 }

@@ -11,8 +11,8 @@ const INITIAL_FS = {
       name: 'school',
       type: 'folder',
       children: [
-        { id: 'file-1', name: 'my-first-assignment.txt', type: 'file' },
-        { id: 'file-2', name: 'class-notes.txt', type: 'file' },
+        { id: 'file-1', name: 'my-first-assignment.txt', type: 'file', content: 'Assignment 1 — Introduction\n\nWrite a short paragraph about your goals for this course.\n\nDue date: Monday\nPoints: 20' },
+        { id: 'file-2', name: 'class-notes.txt', type: 'file', content: 'BUS 101 — Week 1 Notes\n\n• Introduction to business fundamentals\n• Reading: chapters 1–2\n• Quiz on Friday\n• Group project announced' },
       ],
     },
     {
@@ -21,7 +21,7 @@ const INITIAL_FS = {
       type: 'folder',
       children: [],
     },
-    { id: 'file-3', name: 'welcome.txt', type: 'file' },
+    { id: 'file-3', name: 'welcome.txt', type: 'file', content: 'Welcome to your file manager!\n\nHere you can organise all your files. Try:\n• Double-clicking a folder to open it\n• Creating new folders with "+ new folder"\n• Renaming items (right-click or select → rename)\n• Moving files by dragging them\n• Deleting files you no longer need' },
   ],
 }
 
@@ -105,6 +105,7 @@ export default function FileExplorerSim({ onClose, onAthenaEvent, simContext }) 
   const [dragOverId, setDragOverId] = useState(null)
   const [contextMenu, setContextMenu] = useState(null)
   const [completed, setCompleted] = useState(new Set())
+  const [viewingFile, setViewingFile] = useState(null)
   const dragItemId = useRef(null)
   const renameInputRef = useRef(null)
 
@@ -335,7 +336,10 @@ export default function FileExplorerSim({ onClose, onAthenaEvent, simContext }) 
                   onDrop={item.type === 'folder' ? e => onDrop(e, item.id) : undefined}
                   onDragLeave={() => setDragOverId(null)}
                   onClick={() => setSelectedId(item.id)}
-                  onDoubleClick={() => item.type === 'folder' && navigateTo(item.id)}
+                  onDoubleClick={() => {
+                    if (item.type === 'folder') navigateTo(item.id)
+                    else setViewingFile({ name: item.name, content: item.content ?? '(empty file)' })
+                  }}
                   onContextMenu={e => onRightClick(e, item.id)}
                 >
                   <span className="fes__item-icon">{item.type === 'folder' ? '📁' : '📄'}</span>
@@ -416,6 +420,19 @@ export default function FileExplorerSim({ onClose, onAthenaEvent, simContext }) 
             </button>
           </li>
         </ul>
+      )}
+
+      {viewingFile && (
+        <div className="fes__file-overlay" onClick={() => setViewingFile(null)}>
+          <div className="fes__file-modal" onClick={e => e.stopPropagation()}>
+            <div className="fes__file-modal-bar">
+              <span className="fes__file-modal-icon">📄</span>
+              <span className="fes__file-modal-name">{viewingFile.name}</span>
+              <button className="fes__file-modal-close" onClick={() => setViewingFile(null)}>×</button>
+            </div>
+            <pre className="fes__file-modal-content">{viewingFile.content}</pre>
+          </div>
+        </div>
       )}
     </div>
   )

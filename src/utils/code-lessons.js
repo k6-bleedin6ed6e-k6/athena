@@ -80,7 +80,7 @@ export const pythonGradeLesson = {
     {
       id:          'say-hello',
       title:       'say hello',
-      instruction: "Every program starts somewhere. Start yours by printing your name — just so the script knows who it belongs to.\n\nClick ▶ run to see it work.",
+      instruction: "Every program starts somewhere.\n\nIn Python, print() displays text on screen. Type this exactly:\n\nprint(\"Hello, I'm Alex\")\n\nThen click ▶ run — you should see the text appear below the editor.",
       validate:    (files) => files['grades.py']?.includes('print('),
       solution:    SOL_1,
       hint:        'print("Hello, I\'m Alex")',

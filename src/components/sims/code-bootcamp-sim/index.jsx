@@ -218,7 +218,7 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent, onSimContext }
   }, [])
 
   const canAdvance  = validation === 'pass'
-  const hintVisible = showHint || (validation === 'fail' && attempts >= 2 && !showSolution)
+  const hintVisible = stepIndex === 0 || showHint || (validation === 'fail' && attempts >= 2 && !showSolution)
 
   return (
     <div className="cb-sim">

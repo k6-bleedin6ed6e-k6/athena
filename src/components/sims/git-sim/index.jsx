@@ -551,7 +551,7 @@ function SandboxTerminal({ lessonGitState }) {
 
     // ── Editor ────────────────────────────────────────────────────────────────
     if (prog === 'nano' || prog === 'vim' || prog === 'vi') {
-      const filename = rest[0]
+      const filename = sub
       if (!filename) { push(prompt_str(), cmd, [RED(`${prog}: no file specified`)]); return }
       const localContent = gs.fileContents?.[filename]
       if (localContent === null) {
@@ -570,7 +570,7 @@ function SandboxTerminal({ lessonGitState }) {
 
     // ── touch ─────────────────────────────────────────────────────────────────
     if (prog === 'touch') {
-      const filename = rest[0]
+      const filename = sub
       if (!filename) { push(prompt_str(), cmd, [RED('touch: missing file operand')]); return }
       setSandboxGs(prev => {
         if (prev.fileContents?.[filename] !== undefined || prev.untracked.includes(filename)) return prev
@@ -586,7 +586,7 @@ function SandboxTerminal({ lessonGitState }) {
 
     // ── python / python3 ─────────────────────────────────────────────────────
     if (prog === 'python' || prog === 'python3') {
-      const filename = rest[0]
+      const filename = sub
       if (!filename) { push(prompt_str(), cmd, [RED('usage: python <script.py>')]); return }
       const content = gs.fileContents?.[filename]
       if (content === undefined || content === null) {
@@ -628,7 +628,7 @@ function SandboxTerminal({ lessonGitState }) {
 
     // ── mkdir ─────────────────────────────────────────────────────────────────
     if (prog === 'mkdir') {
-      const dirname = rest[0]
+      const dirname = sub
       if (!dirname) { push(prompt_str(), cmd, [RED('mkdir: missing operand')]); return }
       push(prompt_str(), cmd, [])
       return
@@ -636,7 +636,7 @@ function SandboxTerminal({ lessonGitState }) {
 
     // ── rm ────────────────────────────────────────────────────────────────────
     if (prog === 'rm') {
-      const target = rest.find(a => !a.startsWith('-'))
+      const target = [sub, ...rest].find(a => !a.startsWith('-'))
       if (!target) { push(prompt_str(), cmd, [RED('rm: missing operand')]); return }
       const exists = gs.fileContents?.[target] !== undefined ||
                      gs.untracked.includes(target) ||
