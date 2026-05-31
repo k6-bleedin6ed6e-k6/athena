@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { shiptivitasLesson } from '../../../utils/code-lessons'
+import { pythonGradeLesson } from '../../../utils/code-lessons'
 import { highlight } from '../../../utils/highlight'
 import { playChime } from '../../../utils/sound'
 import { runPython, isPyodideReady } from '../../../utils/pyodide-runner'
@@ -25,7 +25,7 @@ function clearSession(lessonId) {
   try { localStorage.removeItem(STORAGE_KEY(lessonId)) } catch {}
 }
 
-/* ─── Editor: syntax-highlighted overlay ─── */
+/* ─── Editor ─── */
 function Editor({ value, onChange, readOnly }) {
   const textareaRef = useRef(null)
   const highlightRef = useRef(null)
@@ -89,142 +89,31 @@ function Editor({ value, onChange, readOnly }) {
   )
 }
 
-/* ─── Kanban Preview: staged by mode ─── */
-function DemoCard({ client, onDragStart, draggable }) {
-  let cls = 'cb-card'
-  if (client.status === 'backlog') cls += ' cb-card--grey'
-  if (client.status === 'in-progress') cls += ' cb-card--blue'
-  if (client.status === 'complete') cls += ' cb-card--green'
-
-  return (
-    <div
-      className={cls}
-      draggable={draggable}
-      onDragStart={e => draggable && onDragStart?.(e, client.id)}
-      data-id={client.id}
-    >
-      <div className="cb-card__title">{client.name}</div>
-    </div>
-  )
-}
-
-function KanbanDemo({ mode }) {
-  const initial = [
-    { id: '1', name: 'Stark, White and Abbott', status: 'in-progress' },
-    { id: '2', name: 'Wiza LLC', status: 'complete' },
-    { id: '3', name: 'Nolan LLC', status: 'backlog' },
-    { id: '4', name: 'Thompson PLC', status: 'in-progress' },
-    { id: '5', name: 'Walker-Williamson', status: 'in-progress' },
-    { id: '6', name: 'Boehm and Sons', status: 'backlog' },
-    { id: '7', name: 'Runolfsson, Hegmann and Block', status: 'backlog' },
-    { id: '8', name: 'Schumm-Labadie', status: 'backlog' },
-  ]
-
-  const [clients, setClients] = useState(initial)
-  const [snapBackId, setSnapBackId] = useState(null)
-
-  const enableDrag = mode === 'drag-no-sync' || mode === 'solved'
-  const enableSync = mode === 'solved'
-  const allBacklog = mode === 'backlog-no-drag' || mode === 'drag-no-sync' || mode === 'solved'
-
-  const displayClients = allBacklog
-    ? initial.map(c => ({ ...c, status: 'backlog' }))
-    : clients
-
-  function handleDragOver(e) {
-    e.preventDefault()
-  }
-
-  function handleDrop(e, newStatus) {
-    e.preventDefault()
-    const id = e.dataTransfer.getData('text/plain')
-    if (!id) return
-
-    if (!enableSync) {
-      setSnapBackId(id)
-      setTimeout(() => setSnapBackId(null), 600)
-      return
-    }
-
-    setClients(prev => {
-      const moved = prev.find(c => c.id === id)
-      if (!moved || moved.status === newStatus) return prev
-      const others = prev.filter(c => c.id !== id)
-      return [...others, { ...moved, status: newStatus }]
-    })
-  }
-
-  const lanes = [
-    { title: 'backlog', status: 'backlog' },
-    { title: 'in progress', status: 'in-progress' },
-    { title: 'complete', status: 'complete' },
-  ]
-
-  return (
-    <div className="cb-demo">
-      <div className="cb-demo__board">
-        {lanes.map(({ title, status }) => {
-          const laneClients = displayClients.filter(c => c.status === status)
-          return (
-            <div
-              key={status}
-              className="cb-lane"
-              onDragOver={handleDragOver}
-              onDrop={e => handleDrop(e, status)}
-            >
-              <div className="cb-lane__title">{title}</div>
-              <div className="cb-lane__dropzone">
-                {laneClients.map(client => (
-                  <DemoCard
-                    key={client.id}
-                    client={client}
-                    draggable={enableDrag}
-                    onDragStart={(e, id) => {
-                      e.dataTransfer.setData('text/plain', id)
-                    }}
-                  />
-                ))}
-                {snapBackId && (
-                  <div className="cb-demo__snap-hint">
-                    cards snap back — state not synced yet
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-/* ─── Main Lesson Engine ─── */
-export default function CodeBootcampSim({ onClose, onAthenaEvent }) {
-  const lesson = shiptivitasLesson
+/* ─── Main ─── */
+export default function CodeBootcampSim({ onClose, onAthenaEvent, onSimContext }) {
+  const lesson = pythonGradeLesson
   const saved  = loadSession(lesson)
 
-  const [stepIndex, setStepIndex] = useState(saved?.stepIndex ?? 0)
-  const [files, setFiles] = useState(() => {
+  const [stepIndex,    setStepIndex]    = useState(saved?.stepIndex ?? 0)
+  const [files,        setFiles]        = useState(() => {
     const defaults = {}
     Object.keys(lesson.files).forEach(k => { defaults[k] = lesson.files[k].initial })
     return saved?.files ? { ...defaults, ...saved.files } : defaults
   })
-  const [openFile,     setOpenFile]     = useState('board.js')
   const [validation,   setValidation]   = useState('idle')
   const [attempts,     setAttempts]     = useState(0)
   const [showHint,     setShowHint]     = useState(false)
   const [showSolution, setShowSolution] = useState(false)
-  const [confirmReset,  setConfirmReset]  = useState(false)
-  const [pyOpen,        setPyOpen]        = useState(false)
-  const [pyCode,        setPyCode]        = useState('# write Python here\nprint("hello, world!")\n')
-  const [pyOutput,      setPyOutput]      = useState(null)
-  const [pyStatus,      setPyStatus]      = useState('idle') // idle | loading | running | done | error
-  const firedRef       = useRef(new Set())
-  const resetTimerRef  = useRef(null)
+  const [confirmReset, setConfirmReset] = useState(false)
+  const [pyOutput,     setPyOutput]     = useState(null)
+  const [pyStatus,     setPyStatus]     = useState('idle')
+  const firedRef      = useRef(new Set())
+  const resetTimerRef = useRef(null)
 
-  const step = lesson.steps[stepIndex]
+  const step   = lesson.steps[stepIndex]
   const isFirst = stepIndex === 0
-  const isLast = stepIndex === lesson.steps.length - 1
+  const isLast  = stepIndex === lesson.steps.length - 1
+  const mainFile = Object.keys(lesson.files)[0]
 
   function fire(event, context = '') {
     const key = `${event}:${stepIndex}`
@@ -239,11 +128,14 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent }) {
     setShowHint(false)
     setTimeout(() => {
       try {
-        const passed = step.validate(files)
+        const passed = step.validate(files, pyOutput)
         if (passed) {
           setValidation('pass')
-          if (step.id !== 'ship-it') playChime()
-          fire(step.id === 'ship-it' ? 'lesson-complete' : 'step-advanced', step.title)
+          if (!isLast) playChime()
+          fire(isLast ? 'lesson-complete' : 'step-advanced', step.title)
+          if (isLast) {
+            onSimContext?.({ pythonScript: { name: mainFile, content: files[mainFile] } })
+          }
         } else {
           setValidation('fail')
           fire('step-failed', step.title)
@@ -263,9 +155,7 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent }) {
       setAttempts(0)
       setShowHint(false)
       setShowSolution(false)
-      if (lesson.steps[next]?.targetFile) {
-        setOpenFile(lesson.steps[next].targetFile)
-      }
+      setPyOutput(null)
     }
   }
 
@@ -280,26 +170,22 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent }) {
   }
 
   function applySolution() {
-    const target = step.targetFile || 'board.js'
-    setFiles(prev => ({ ...prev, [target]: lesson.files[target].solution }))
+    setFiles(prev => ({ ...prev, [mainFile]: step.solution || lesson.files[mainFile].solution }))
     setShowSolution(false)
-    setValidation('pass')
-    const isLastStep = stepIndex === lesson.steps.length - 1
-    fire(isLastStep ? 'lesson-complete' : 'step-advanced', step.title)
+    setValidation('idle')
   }
 
-  // Persist session on every meaningful change
-  useEffect(() => {
-    saveSession(lesson.id, stepIndex, files)
-  }, [stepIndex, files])
-
-  useEffect(() => {
-    if (step.targetFile) setOpenFile(step.targetFile)
-  }, [stepIndex, step.targetFile])
-
-  useEffect(() => {
-    fire('bootcamp-opened')
-  }, [])
+  async function handleRunPython() {
+    if (pyStatus === 'loading' || pyStatus === 'running') return
+    setPyOutput(null)
+    setPyStatus(isPyodideReady() ? 'running' : 'loading')
+    const code = files[mainFile] || ''
+    const { output, error } = await runPython(code, s => setPyStatus(s === 'ready' ? 'running' : 'loading'))
+    const result = { output, error }
+    setPyOutput(result)
+    setPyStatus(error ? 'error' : 'done')
+    onAthenaEvent?.({ lesson: 'code-bootcamp', event: 'python-run', context: error ? 'error' : 'success' })
+  }
 
   function handleRestart() {
     if (!confirmReset) {
@@ -313,54 +199,43 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent }) {
     Object.keys(lesson.files).forEach(k => { defaults[k] = lesson.files[k].initial })
     setFiles(defaults)
     setStepIndex(0)
-    setOpenFile('board.js')
     setValidation('idle')
     setAttempts(0)
     setShowHint(false)
     setShowSolution(false)
     setConfirmReset(false)
+    setPyOutput(null)
+    setPyStatus('idle')
     firedRef.current = new Set()
   }
 
-  async function handleRunPython() {
-    if (pyStatus === 'loading' || pyStatus === 'running') return
-    setPyOutput(null)
-    setPyStatus(isPyodideReady() ? 'running' : 'loading')
-    const { output, error } = await runPython(pyCode, s => setPyStatus(s === 'ready' ? 'running' : 'loading'))
-    setPyOutput({ output, error })
-    setPyStatus(error ? 'error' : 'done')
-    onAthenaEvent?.({ lesson: 'code-bootcamp', event: 'python-run', context: error ? 'error' : 'success' })
-  }
+  useEffect(() => {
+    saveSession(lesson.id, stepIndex, files)
+  }, [stepIndex, files])
 
-  const canAdvance = validation === 'pass'
+  useEffect(() => {
+    fire('bootcamp-opened')
+  }, [])
+
+  const canAdvance  = validation === 'pass'
   const hintVisible = showHint || (validation === 'fail' && attempts >= 2 && !showSolution)
 
   return (
     <div className="cb-sim">
-      {/* Top */}
+      {/* Top bar */}
       <div className="cb-sim__top">
-        <div className="cb-sim__brand">🧪 {lesson.title}</div>
+        <div className="cb-sim__brand">🐍 {lesson.title}</div>
         <div className="cb-sim__step-track">
           {lesson.steps.map((s, i) => (
             <button
               key={s.id}
               className={`cb-sim__step-pip${i === stepIndex ? ' cb-sim__step-pip--active' : ''}${i < stepIndex ? ' cb-sim__step-pip--done' : ''}`}
-              onClick={() => {
-                if (i <= stepIndex || lesson.steps[i - 1]?.validate(files)) {
-                  setStepIndex(i)
-                  setValidation('idle')
-                }
-              }}
+              onClick={() => { if (i <= stepIndex) { setStepIndex(i); setValidation('idle') } }}
               title={s.title}
             />
           ))}
         </div>
         <div className="cb-sim__top-actions">
-          <button
-            className={`cb-sim__py-toggle${pyOpen ? ' cb-sim__py-toggle--on' : ''}`}
-            onClick={() => setPyOpen(o => !o)}
-            title="Python playground"
-          >🐍 python</button>
           {confirmReset ? (
             <>
               <span className="cb-sim__reset-prompt">restart?</span>
@@ -368,7 +243,7 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent }) {
               <button className="cb-sim__reset-cancel" onClick={() => { clearTimeout(resetTimerRef.current); setConfirmReset(false) }}>no</button>
             </>
           ) : (
-            <button className="cb-sim__restart" onClick={handleRestart} title="restart from beginning">↺</button>
+            <button className="cb-sim__restart" onClick={handleRestart} title="restart">↺</button>
           )}
         </div>
         <button className="cb-sim__close" onClick={onClose} aria-label="close">×</button>
@@ -376,151 +251,83 @@ export default function CodeBootcampSim({ onClose, onAthenaEvent }) {
 
       {/* Workspace */}
       <div className="cb-sim__workspace">
-        {/* File tree */}
-        <aside className="cb-sim__file-panel">
-          <div className="cb-sim__panel-label">files</div>
-          {Object.keys(lesson.files).map(filename => (
-            <button
-              key={filename}
-              className={`cb-sim__file${openFile === filename ? ' cb-sim__file--active' : ''}${lesson.files[filename].readOnly ? ' cb-sim__file--readonly' : ''}`}
-              onClick={() => setOpenFile(filename)}
-            >
-              {filename}
-              {lesson.files[filename].readOnly && (
-                <span className="cb-sim__file-badge">ro</span>
-              )}
-            </button>
-          ))}
-        </aside>
-
         {/* Editor */}
-        <div className="cb-sim__editor-panel">
+        <div className="cb-sim__editor-panel cb-sim__editor-panel--full">
           <div className="cb-sim__editor-bar">
-            <span className="cb-sim__editor-name">{openFile}</span>
-            {lesson.files[openFile]?.readOnly && (
-              <span className="cb-sim__editor-badge">read only</span>
-            )}
+            <span className="cb-sim__editor-name">{mainFile}</span>
+            <button
+              className={`cb-sim__run-btn${pyStatus === 'loading' || pyStatus === 'running' ? ' cb-sim__run-btn--busy' : ''}`}
+              onClick={handleRunPython}
+              disabled={pyStatus === 'loading' || pyStatus === 'running'}
+            >
+              {pyStatus === 'loading' ? '⏳ loading Python…' : pyStatus === 'running' ? '⏳ running…' : '▶ run'}
+            </button>
           </div>
           <Editor
-            value={files[openFile] || ''}
-            onChange={val => setFiles(prev => ({ ...prev, [openFile]: val }))}
-            readOnly={lesson.files[openFile]?.readOnly}
+            value={files[mainFile] || ''}
+            onChange={val => { setFiles(prev => ({ ...prev, [mainFile]: val })); setPyOutput(null) }}
           />
+          {/* Output */}
+          <div className="cb-sim__output">
+            {pyOutput === null && (
+              <span className="cb-sim__output-empty">output appears here after you click ▶ run</span>
+            )}
+            {pyOutput?.output && (
+              <pre className="cb-sim__output-text">{pyOutput.output}</pre>
+            )}
+            {pyOutput?.error && (
+              <pre className="cb-sim__output-error">{pyOutput.error}</pre>
+            )}
+            {pyOutput && !pyOutput.output && !pyOutput.error && (
+              <span className="cb-sim__output-empty">(no output)</span>
+            )}
+          </div>
         </div>
 
-        {/* Guide + Preview */}
+        {/* Guide panel */}
         <aside className="cb-sim__guide-panel">
           <div className="cb-sim__step-title">{step.title}</div>
           <div className="cb-sim__step-instruction">{step.instruction}</div>
 
           {hintVisible && (
             <div className="cb-sim__hint">
-              <strong>hint:</strong> {step.hint}
+              <strong>hint:</strong>
+              <pre className="cb-sim__hint-code">{step.hint}</pre>
             </div>
           )}
 
           {validation === 'fail' && attempts >= 2 && !showSolution && (
             <button className="cb-sim__link-btn" onClick={() => setShowSolution(true)}>
-              stuck? show solution
+              stuck? show an example
             </button>
           )}
 
           {showSolution && (
             <div className="cb-sim__solution-box">
-              <p>This replaces your code with the working solution for this step.</p>
-              <button className="cb-sim__btn cb-sim__btn--primary" onClick={applySolution}>
-                apply solution
-              </button>
-              <button className="cb-sim__btn" onClick={() => setShowSolution(false)}>
-                cancel
-              </button>
+              <p>This replaces your code with a working example for this step.</p>
+              <button className="cb-sim__btn cb-sim__btn--primary" onClick={applySolution}>apply example</button>
+              <button className="cb-sim__btn" onClick={() => setShowSolution(false)}>cancel</button>
             </div>
           )}
 
           <div className="cb-sim__validation">
-            {validation === 'checking' && (
-              <span className="cb-sim__status cb-sim__status--checking">checking...</span>
-            )}
-            {validation === 'pass' && (
-              <span className="cb-sim__status cb-sim__status--pass">✓ looks good — advance to next step</span>
-            )}
-            {validation === 'fail' && (
-              <span className="cb-sim__status cb-sim__status--fail">✗ not quite — read the hint and try again</span>
-            )}
+            {validation === 'checking' && <span className="cb-sim__status cb-sim__status--checking">checking…</span>}
+            {validation === 'pass'     && <span className="cb-sim__status cb-sim__status--pass">✓ looks good</span>}
+            {validation === 'fail'     && <span className="cb-sim__status cb-sim__status--fail">✗ not quite yet</span>}
           </div>
 
           <div className="cb-sim__actions">
             <button className="cb-sim__btn" onClick={goPrev} disabled={isFirst}>← prev</button>
             {!canAdvance ? (
-              <button className="cb-sim__btn cb-sim__btn--primary" onClick={handleCheck}>
-                check my work
-              </button>
+              <button className="cb-sim__btn cb-sim__btn--primary" onClick={handleCheck}>check my work</button>
+            ) : isLast ? (
+              <button className="cb-sim__btn cb-sim__btn--primary" disabled>finished ✓</button>
             ) : (
-              <button className="cb-sim__btn cb-sim__btn--primary" onClick={goNext} disabled={isLast}>
-                {isLast ? 'finished' : 'next →'}
-              </button>
+              <button className="cb-sim__btn cb-sim__btn--primary" onClick={goNext}>next →</button>
             )}
-          </div>
-
-          <div className="cb-sim__preview-wrap">
-            <div className="cb-sim__preview-label">live preview</div>
-            <KanbanDemo mode={step.previewMode} />
           </div>
         </aside>
       </div>
-
-      {/* Python playground panel */}
-      {pyOpen && (
-        <div className="cb-py">
-          <div className="cb-py__header">
-            <span className="cb-py__label">🐍 Python</span>
-            <span className="cb-py__status">
-              {pyStatus === 'loading' && 'booting Python…'}
-              {pyStatus === 'running' && 'running…'}
-            </span>
-            <button
-              className="cb-py__run"
-              onClick={handleRunPython}
-              disabled={pyStatus === 'loading' || pyStatus === 'running'}
-            >
-              {pyStatus === 'loading' || pyStatus === 'running' ? '…' : '▶ run'}
-            </button>
-          </div>
-          <div className="cb-py__body">
-            <textarea
-              className="cb-py__editor"
-              value={pyCode}
-              onChange={e => setPyCode(e.target.value)}
-              spellCheck={false}
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="off"
-              onKeyDown={e => {
-                if (e.key === 'Tab') {
-                  e.preventDefault()
-                  const s = e.target.selectionStart
-                  const n = pyCode.substring(0, s) + '  ' + pyCode.substring(e.target.selectionEnd)
-                  setPyCode(n)
-                  requestAnimationFrame(() => e.target.setSelectionRange(s + 2, s + 2))
-                }
-              }}
-            />
-            {pyOutput !== null && (
-              <div className="cb-py__output">
-                {pyOutput.output && (
-                  <pre className="cb-py__out-text">{pyOutput.output}</pre>
-                )}
-                {pyOutput.error && (
-                  <pre className="cb-py__out-error">{pyOutput.error}</pre>
-                )}
-                {!pyOutput.output && !pyOutput.error && (
-                  <span className="cb-py__out-empty">(no output)</span>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

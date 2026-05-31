@@ -690,3 +690,68 @@
   font-size: 11px;
   color: #484f58;
 }
+
+/* Python-first layout */
+.cb-sim__editor-panel--full {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.cb-sim__run-btn {
+  padding: 4px 14px;
+  border-radius: 5px;
+  border: 1px solid var(--athena-gold, #d4af37);
+  background: rgba(212,175,55,0.12);
+  color: var(--athena-gold, #d4af37);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.cb-sim__run-btn:hover:not(:disabled) {
+  background: rgba(212,175,55,0.22);
+}
+.cb-sim__run-btn--busy,
+.cb-sim__run-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.cb-sim__output {
+  height: 120px;
+  min-height: 80px;
+  background: #0d1117;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 14px;
+  overflow-y: auto;
+  font-family: monospace;
+}
+.cb-sim__output-text {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #c9d1d9;
+  white-space: pre-wrap;
+  margin: 0;
+}
+.cb-sim__output-error {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #f85149;
+  white-space: pre-wrap;
+  margin: 0;
+}
+.cb-sim__output-empty {
+  font-size: 11px;
+  color: #484f58;
+}
+.cb-sim__hint-code {
+  margin: 6px 0 0;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 4px;
+  font-size: 11.5px;
+  color: #c9d1d9;
+  white-space: pre-wrap;
+  font-family: monospace;
+}

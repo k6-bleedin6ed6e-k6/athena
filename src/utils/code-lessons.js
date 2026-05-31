@@ -1,356 +1,140 @@
-export const shiptivitasLesson = {
-  id: 'shiptivitas-kanban',
-  title: 'build a kanban board',
-  description: 'Add drag-and-drop to a React shipping dashboard.',
+const STARTER = `# Grade Calculator — BUS 101
+# Run your code with the ▶ run button
+
+`
+
+const SOL_1 = `# Grade Calculator — BUS 101
+print("Hello, I'm Alex")
+`
+
+const SOL_2 = `# Grade Calculator — BUS 101
+print("Hello, I'm Alex")
+
+grades = [85, 92, 78, 90, 88]
+print(grades)
+`
+
+const SOL_3 = `# Grade Calculator — BUS 101
+print("Hello, I'm Alex")
+
+grades = [85, 92, 78, 90, 88]
+average = sum(grades) / len(grades)
+print(average)
+`
+
+const SOL_4 = `# Grade Calculator — BUS 101
+print("Hello, I'm Alex")
+
+grades = [85, 92, 78, 90, 88]
+average = sum(grades) / len(grades)
+
+if average >= 90:
+    print("A")
+elif average >= 80:
+    print("B")
+elif average >= 70:
+    print("C")
+elif average >= 60:
+    print("D")
+else:
+    print("F")
+`
+
+const SOL_5 = `# Grade Calculator — BUS 101
+def calculate_grade(grades):
+    average = sum(grades) / len(grades)
+    if average >= 90:
+        return "A"
+    elif average >= 80:
+        return "B"
+    elif average >= 70:
+        return "C"
+    elif average >= 60:
+        return "D"
+    else:
+        return "F"
+
+my_grades = [85, 92, 78, 90, 88]
+print("Hello, I'm Alex")
+print("Grade:", calculate_grade(my_grades))
+`
+
+const SOL_6 = SOL_5
+
+export const pythonGradeLesson = {
+  id:       'python-grade-calculator',
+  title:    'grade calculator',
+  language: 'python',
+  description: 'Write a Python script to calculate your BUS 101 grade.',
+
   files: {
-    'board.js': {
-      language: 'javascript',
+    'grades.py': {
+      language: 'python',
       readOnly: false,
-      initial: `import React from 'react';
-import Swimlane from './Swimlane';
-import './Board.css';
-
-export default class Board extends React.Component {
-  constructor(props) {
-    super(props);
-    const clients = this.getClients();
-    this.state = {
-      clients: {
-        backlog: clients.filter(client => !client.status || client.status === 'backlog'),
-        inProgress: clients.filter(client => client.status && client.status === 'in-progress'),
-        complete: clients.filter(client => client.status && client.status === 'complete'),
-      }
-    }
-    this.swimlanes = {
-      backlog: React.createRef(),
-      inProgress: React.createRef(),
-      complete: React.createRef(),
-    }
-  }
-  getClients() {
-    return [
-      ['1','Stark, White and Abbott','Cloned Optimal Architecture', 'in-progress'],
-      ['2','Wiza LLC','Exclusive Bandwidth-Monitored Implementation', 'complete'],
-      ['3','Nolan LLC','Vision-Oriented 4Thgeneration Graphicaluserinterface', 'backlog'],
-      ['4','Thompson PLC','Streamlined Regional Knowledgeuser', 'in-progress'],
-      ['5','Walker-Williamson','Team-Oriented 6Thgeneration Matrix', 'in-progress'],
-      ['6','Boehm and Sons','Automated Systematic Paradigm', 'backlog'],
-      ['7','Runolfsson, Hegmann and Block','Integrated Transitional Strategy', 'backlog'],
-      ['8','Schumm-Labadie','Operative Heuristic Challenge', 'backlog'],
-      ['9','Kohler Group','Re-Contextualized Multi-Tasking Attitude', 'backlog'],
-      ['10','Romaguera Inc','Managed Foreground Toolset', 'backlog'],
-      ['11','Reilly-King','Future-Proofed Interactive Toolset', 'complete'],
-      ['12','Emard, Champlin and Runolfsdottir','Devolved Needs-Based Capability', 'backlog'],
-      ['13','Fritsch, Cronin and Wolff','Open-Source 3Rdgeneration Website', 'complete'],
-      ['14','Borer LLC','Profit-Focused Incremental Orchestration', 'backlog'],
-      ['15','Emmerich-Ankunding','User-Centric Stable Extranet', 'in-progress'],
-      ['16','Willms-Abbott','Progressive Bandwidth-Monitored Access', 'in-progress'],
-      ['17','Brekke PLC','Intuitive User-Facing Customerloyalty', 'complete'],
-      ['18','Bins, Toy and Klocko','Integrated Assymetric Software', 'backlog'],
-      ['19','Hodkiewicz-Hayes','Programmable Systematic Securedline', 'backlog'],
-      ['20','Murphy, Lang and Ferry','Organized Explicit Access', 'backlog'],
-    ].map(companyDetails => ({
-      id: companyDetails[0],
-      name: companyDetails[1],
-      description: companyDetails[2],
-      status: companyDetails[3],
-    }));
-  }
-  renderSwimlane(name, clients, ref) {
-    return (
-      <Swimlane name={name} clients={clients} dragulaRef={ref}/>
-    );
-  }
-
-  render() {
-    return (
-      <div className="Board">
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-md-4">
-              {this.renderSwimlane('Backlog', this.state.clients.backlog, this.swimlanes.backlog)}
-            </div>
-            <div className="col-md-4">
-              {this.renderSwimlane('In Progress', this.state.clients.inProgress, this.swimlanes.inProgress)}
-            </div>
-            <div className="col-md-4">
-              {this.renderSwimlane('Complete', this.state.clients.complete, this.swimlanes.complete)}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-}`,
-      solution: `import React from 'react';
-import Dragula from 'dragula';
-import 'dragula/dist/dragula.css';
-import Swimlane from './Swimlane';
-import './Board.css';
-
-export default class Board extends React.Component {
-  constructor(props) {
-    super(props);
-    const clients = this.getClients();
-    this.state = {
-      clients: {
-        backlog: clients,
-        inProgress: [],
-        complete: [],
-      }
-    }
-    this.swimlanes = {
-      backlog: React.createRef(),
-      inProgress: React.createRef(),
-      complete: React.createRef(),
-    }
-  }
-  getClients() {
-    return [
-      ['1','Stark, White and Abbott','Cloned Optimal Architecture', 'backlog'],
-      ['2','Wiza LLC','Exclusive Bandwidth-Monitored Implementation', 'backlog'],
-      ['3','Nolan LLC','Vision-Oriented 4Thgeneration Graphicaluserinterface', 'backlog'],
-      ['4','Thompson PLC','Streamlined Regional Knowledgeuser', 'backlog'],
-      ['5','Walker-Williamson','Team-Oriented 6Thgeneration Matrix', 'backlog'],
-      ['6','Boehm and Sons','Automated Systematic Paradigm', 'backlog'],
-      ['7','Runolfsson, Hegmann and Block','Integrated Transitional Strategy', 'backlog'],
-      ['8','Schumm-Labadie','Operative Heuristic Challenge', 'backlog'],
-      ['9','Kohler Group','Re-Contextualized Multi-Tasking Attitude', 'backlog'],
-      ['10','Romaguera Inc','Managed Foreground Toolset', 'backlog'],
-      ['11','Reilly-King','Future-Proofed Interactive Toolset', 'backlog'],
-      ['12','Emard, Champlin and Runolfsdottir','Devolved Needs-Based Capability', 'backlog'],
-      ['13','Fritsch, Cronin and Wolff','Open-Source 3Rdgeneration Website', 'backlog'],
-      ['14','Borer LLC','Profit-Focused Incremental Orchestration', 'backlog'],
-      ['15','Emmerich-Ankunding','User-Centric Stable Extranet', 'backlog'],
-      ['16','Willms-Abbott','Progressive Bandwidth-Monitored Access', 'backlog'],
-      ['17','Brekke PLC','Intuitive User-Facing Customerloyalty', 'backlog'],
-      ['18','Bins, Toy and Klocko','Integrated Assymetric Software', 'backlog'],
-      ['19','Hodkiewicz-Hayes','Programmable Systematic Securedline', 'backlog'],
-      ['20','Murphy, Lang and Ferry','Organized Explicit Access', 'backlog'],
-    ].map(companyDetails => ({
-      id: companyDetails[0],
-      name: companyDetails[1],
-      description: companyDetails[2],
-      status: companyDetails[3],
-    }));
-  }
-
-  componentDidMount() {
-    const containers = [
-      this.swimlanes.backlog.current,
-      this.swimlanes.inProgress.current,
-      this.swimlanes.complete.current,
-    ];
-    this.drake = Dragula(containers);
-    this.drake.on('drop', (el, target, source, sibling) => {
-      this.updateStateFromDom();
-    });
-  }
-
-  componentWillUnmount() {
-    if (this.drake) this.drake.destroy();
-  }
-
-  findClientById(id) {
-    const all = [
-      ...this.state.clients.backlog,
-      ...this.state.clients.inProgress,
-      ...this.state.clients.complete,
-    ];
-    return all.find(client => client.id === id);
-  }
-
-  updateStateFromDom() {
-    const laneConfigs = [
-      { key: 'backlog', ref: this.swimlanes.backlog, status: 'backlog' },
-      { key: 'inProgress', ref: this.swimlanes.inProgress, status: 'in-progress' },
-      { key: 'complete', ref: this.swimlanes.complete, status: 'complete' },
-    ];
-    const newClients = { backlog: [], inProgress: [], complete: [] };
-    laneConfigs.forEach(({ key, ref, status }) => {
-      const cards = ref.current.querySelectorAll('.Card');
-      newClients[key] = Array.from(cards).map(card => {
-        const id = card.getAttribute('data-id');
-        const client = this.findClientById(id);
-        return { ...client, status };
-      });
-    });
-    this.setState({ clients: newClients });
-  }
-
-  renderSwimlane(name, clients, ref) {
-    return (
-      <Swimlane name={name} clients={clients} dragulaRef={ref}/>
-    );
-  }
-
-  render() {
-    return (
-      <div className="Board">
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-md-4">
-              {this.renderSwimlane('Backlog', this.state.clients.backlog, this.swimlanes.backlog)}
-            </div>
-            <div className="col-md-4">
-              {this.renderSwimlane('In Progress', this.state.clients.inProgress, this.swimlanes.inProgress)}
-            </div>
-            <div className="col-md-4">
-              {this.renderSwimlane('Complete', this.state.clients.complete, this.swimlanes.complete)}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-}`,
-    },
-    'swimlane.js': {
-      language: 'javascript',
-      readOnly: true,
-      initial: `import React from 'react';
-import Card from './Card';
-import './Swimlane.css';
-
-export default class Swimlane extends React.Component {
-  render() {
-    const cards = this.props.clients.map(client => {
-      return (
-        <Card
-          key={client.id}
-          id={client.id}
-          name={client.name}
-          description={client.description}
-          status={client.status}
-        />
-      );
-    })
-    return (
-      <div className="Swimlane-column">
-        <div className="Swimlane-title">{this.props.name}</div>
-        <div className="Swimlane-dragColumn" ref={this.props.dragulaRef}>
-          {cards}
-        </div>
-      </div>);
-  }
-}`,
-    },
-    'card.js': {
-      language: 'javascript',
-      readOnly: true,
-      initial: `import React from 'react';
-import './Card.css';
-
-export default class Card extends React.Component {
-  render() {
-    let className = ['Card'];
-    if (this.props.status === 'backlog') {
-      className.push('Card-grey');
-    } else if (this.props.status === 'in-progress') {
-      className.push('Card-blue');
-    } else if (this.props.status === 'complete') {
-      className.push('Card-green');
-    }
-    return (
-      <div className={className.join(' ')} data-id={this.props.id} data-status={this.props.status}>
-        <div className="Card-title">{this.props.name}</div>
-      </div>
-    );
-  }
-}`,
+      initial:  STARTER,
+      solution: SOL_6,
     },
   },
 
   steps: [
     {
-      id: 'explore',
-      title: 'explore the codebase',
-      instruction: 'The project has three files: board.js (brain), swimlane.js (column), card.js (task).\n\nRight now board.js splits tasks by their status in the constructor — backlog, in-progress, complete. Click through the files in the sidebar to see what each one does.\n\nWhen you are ready, click "check my work" to continue.',
-      validate: () => true,
-      hint: 'Just read. No code changes yet.',
-      previewMode: 'filtered',
+      id:          'say-hello',
+      title:       'say hello',
+      instruction: "Every program starts somewhere. Start yours by printing your name — just so the script knows who it belongs to.\n\nClick ▶ run to see it work.",
+      validate:    (files) => files['grades.py']?.includes('print('),
+      solution:    SOL_1,
+      hint:        'print("Hello, I\'m Alex")',
     },
     {
-      id: 'backlog-all',
-      title: 'start everything in backlog',
-      instruction: 'The ticket says: "all tasks should now show in the backlog swimlane."\n\nIn board.js, change the constructor so every task starts in the backlog array. The other two arrays should be empty.\n\nAlso change every status in getClients() to "backlog" so the data matches.',
-      targetFile: 'board.js',
-      validate: (files) => {
-        const b = files['board.js']
-        return (
-          b.includes('backlog: clients') &&
-          b.includes('inProgress: []') &&
-          b.includes('complete: []') &&
-          b.includes("'backlog'") &&
-          !b.includes("'in-progress'") &&
-          !b.includes("'complete'")
-        )
+      id:          'store-grades',
+      title:       'store your grades',
+      instruction: "Create a variable called `grades` and set it to a list of your BUS 101 scores.\n\nA list in Python looks like this: [85, 92, 78]\n\nRun it — Python should print your list.",
+      validate:    (files) => /grades\s*=\s*\[[\d\s,]+\]/.test(files['grades.py'] || ''),
+      solution:    SOL_2,
+      hint:        'grades = [85, 92, 78, 90, 88]',
+    },
+    {
+      id:          'find-average',
+      title:       'find the average',
+      instruction: "Calculate the average of your grades.\n\nPython has two built-in tools:\n• sum(grades) — adds them all up\n• len(grades) — counts how many there are\n\nDivide one by the other. Print the result.",
+      validate:    (files) => {
+        const f = files['grades.py'] || ''
+        return f.includes('sum(') && f.includes('len(') && f.includes('/')
       },
-      hint: 'Replace the three .filter() calls with: backlog: clients, inProgress: [], complete: []. Then change every 4th array element in getClients() to \'backlog\'.',
-      previewMode: 'backlog-no-drag',
+      solution:    SOL_3,
+      hint:        'average = sum(grades) / len(grades)\nprint(average)',
     },
     {
-      id: 'import-dragula',
-      title: 'import dragula',
-      instruction: 'Dragula is already installed. You just need to import it.\n\nAdd two lines at the top of board.js:\n1. import Dragula from \'dragula\';\n2. import \'dragula/dist/dragula.css\';',
-      targetFile: 'board.js',
-      validate: (files) => {
-        const b = files['board.js']
-        return b.includes("import Dragula from 'dragula'") && b.includes("import 'dragula/dist/dragula.css'")
+      id:          'letter-grade',
+      title:       'letter grade',
+      instruction: "Turn the average into a letter grade.\n\n• 90 and above → A\n• 80 and above → B\n• 70 and above → C\n• 60 and above → D\n• below 60 → F\n\nUse if / elif / else. Print the letter.",
+      validate:    (files) => {
+        const f = files['grades.py'] || ''
+        return f.includes('if') && f.includes('elif') && (f.includes('"A"') || f.includes("'A'"))
       },
-      hint: 'Look at how React and Swimlane are imported. Do the same for Dragula and its CSS.',
-      previewMode: 'backlog-no-drag',
+      solution:    SOL_4,
+      hint:        'if average >= 90:\n    print("A")\nelif average >= 80:\n    print("B")',
     },
     {
-      id: 'init-dragula',
-      title: 'initialize dragula',
-      instruction: 'Add a componentDidMount() method to Board. Inside it, create a Dragula instance and pass it the three container refs:\n\nthis.swimlanes.backlog.current\nthis.swimlanes.inProgress.current\nthis.swimlanes.complete.current',
-      targetFile: 'board.js',
-      validate: (files) => {
-        const b = files['board.js']
-        return b.includes('componentDidMount') && b.includes('Dragula(') && b.includes('this.swimlanes.backlog.current')
+      id:          'make-function',
+      title:       'make it a function',
+      instruction: "Wrap your grade logic in a reusable function called `calculate_grade`.\n\nA function takes `grades` as a parameter and returns the letter — so you can call it with any set of scores.\n\ndef calculate_grade(grades):\n    # your logic here\n    return letter",
+      validate:    (files) => /def calculate_grade\s*\(/.test(files['grades.py'] || ''),
+      solution:    SOL_5,
+      hint:        'def calculate_grade(grades):\n    average = sum(grades) / len(grades)\n    # if/elif/else here\n    return letter',
+    },
+    {
+      id:          'run-it',
+      title:       'run it',
+      instruction: "Call your function with your grades list and print the result.\n\nThen hit ▶ run. See your grade calculated live.\n\nThis script is yours — you wrote it. Next up: version control it with Git so you never lose it.",
+      validate:    (files, pyOutput) => {
+        const f = files['grades.py'] || ''
+        return f.includes('calculate_grade(') && (pyOutput?.output?.trim().length > 0)
       },
-      hint: 'this.drake = Dragula([this.swimlanes.backlog.current, this.swimlanes.inProgress.current, this.swimlanes.complete.current]);',
-      previewMode: 'drag-no-sync',
-    },
-    {
-      id: 'handle-drop',
-      title: 'handle the drop',
-      instruction: 'Dragula moves the DOM, but React does not know. On the next render, cards would snap back.\n\nListen for the "drop" event on this.drake. When it fires, read the DOM order of all three columns and rebuild state to match.\n\nYou will need:\n- findClientById(id)\n- updateStateFromDom()\n- querySelectorAll(\'.Card\') on each ref',
-      targetFile: 'board.js',
-      validate: (files) => {
-        const b = files['board.js']
-        return (
-          b.includes("this.drake.on('drop'") &&
-          b.includes('updateStateFromDom') &&
-          b.includes('findClientById') &&
-          b.includes("querySelectorAll('.Card')")
-        )
-      },
-      hint: 'this.drake.on(\'drop\', () => this.updateStateFromDom()); In updateStateFromDom, loop over the three refs, query for .Card elements, map them to client objects by data-id, and setState.',
-      previewMode: 'solved',
-    },
-    {
-      id: 'cleanup',
-      title: 'clean up on unmount',
-      instruction: 'Add componentWillUnmount() to destroy the Dragula instance. This prevents memory leaks when the user navigates away.',
-      targetFile: 'board.js',
-      validate: (files) => {
-        const b = files['board.js']
-        return b.includes('componentWillUnmount') && b.includes('this.drake.destroy')
-      },
-      hint: 'if (this.drake) this.drake.destroy();',
-      previewMode: 'solved',
-    },
-    {
-      id: 'ship-it',
-      title: 'ship it',
-      instruction: 'All acceptance criteria should now pass:\n\n✅ All tasks show in backlog\n✅ Three swimlanes exist\n✅ Drag reorders within a lane\n✅ Drag moves between lanes\n✅ Color changes on status change\n\nTry the preview below. Drag cards between columns. Watch colors update.\n\nYou built a real frontend feature.',
-      validate: () => true,
-      hint: 'You are done. Explore the preview.',
-      previewMode: 'solved',
+      solution:    SOL_6,
+      hint:        'print("Grade:", calculate_grade(my_grades))\n\nThen click ▶ run.',
     },
   ],
 }
 
-export const CODE_LESSONS = [shiptivitasLesson]
+export const CODE_LESSONS = [pythonGradeLesson]

@@ -949,12 +949,23 @@ function SandboxTerminal({ lessonGitState }) {
 }
 
 // ─── Main sim ─────────────────────────────────────────────────────────────────
-export default function GitSim({ onClose, onAthenaEvent }) {
+export default function GitSim({ onClose, onAthenaEvent, simContext }) {
   const lesson = gitBasicsLesson
   const saved  = loadGitSession(lesson)
 
   const [stepIndex,    setStepIndex]    = useState(saved?.stepIndex   ?? 0)
-  const [gitState,     setGitState]     = useState(saved?.gitState    ?? { ...lesson.initialState })
+  const [gitState,     setGitState]     = useState(() => {
+    const base = saved?.gitState ?? { ...lesson.initialState }
+    const script = simContext?.pythonScript
+    if (script && !base.fileContents?.[script.name]) {
+      return {
+        ...base,
+        untracked:    [...(base.untracked || []), script.name],
+        fileContents: { ...(base.fileContents || {}), [script.name]: script.content },
+      }
+    }
+    return base
+  })
   const [history,      setHistory]      = useState(saved?.history     ?? [])
   const [input,        setInput]        = useState('')
   const [validation,   setValidation]   = useState('idle')
