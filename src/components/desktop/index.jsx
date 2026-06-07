@@ -144,10 +144,16 @@ export default function Desktop({
     const code = restoreCode.trim()
     if (!code) return
     setRestoreState('loading')
+
+    // Accept restore URL or bare base64 code pasted in the wrong field
+    const match = code.match(/[?&]restore=([^&\s]+)/)
+    const b64 = match ? match[1] : code
+    if (codeToProgress(b64)) { window.location.reload(); return }
+
     const result = await restoreFromPassphrase(code)
     if (!result || result.learner?.is_new) {
       setRestoreState('error')
-      setTimeout(() => setRestoreState('idle'), 3000)
+      setTimeout(() => setRestoreState('idle'), 4000)
     } else {
       window.location.reload()
     }
@@ -299,7 +305,7 @@ export default function Desktop({
             <div className="desktop__restore-row">
               <input
                 className="desktop__restore-input"
-                placeholder="e.g. amber-cedar-42"
+                placeholder="save code or restore link"
                 value={restoreCode}
                 onChange={e => setRestoreCode(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handlePassphraseRestore()}

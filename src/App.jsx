@@ -322,7 +322,7 @@ export default function App() {
             totalXP={totalXP}
             currentWeek={currentWeek}
             completedLessons={completedLessons}
-            noPassphrase={!getPassphrase()}
+            noPassphrase={completedLessons.size === 0}
           />
         )}
       </div>
