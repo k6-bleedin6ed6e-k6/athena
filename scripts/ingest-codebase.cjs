@@ -79,8 +79,8 @@ function ingestRepo(repoPath) {
 
 function main() {
   if (!fs.existsSync(CODEX_DIR)) {
-    console.error(`codex dir not found: ${CODEX_DIR}`)
-    process.exit(1)
+    console.log(`codex dir not found — skipping ingest`)
+    process.exit(0)
   }
 
   const entries = fs.readdirSync(CODEX_DIR)
