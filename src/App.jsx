@@ -136,12 +136,14 @@ export default function App() {
 
   useEffect(() => {
     const r = document.documentElement
-    r.style.setProperty('--athena-gold',        palette.gold)
-    r.style.setProperty('--athena-gold-dim',    `rgba(${palette.goldRgb}, 0.15)`)
-    r.style.setProperty('--athena-gold-border', `rgba(${palette.goldRgb}, 0.25)`)
-    r.style.setProperty('--athena-bg-base',     palette.bgBase)
-    r.style.setProperty('--athena-bg-surface',  palette.bgSurface)
-    r.style.setProperty('--athena-bg-panel',    palette.bgPanel)
+    r.style.setProperty('--athena-gold',           palette.gold)
+    r.style.setProperty('--athena-gold-dim',       `rgba(${palette.goldRgb}, 0.15)`)
+    r.style.setProperty('--athena-gold-border',    `rgba(${palette.goldRgb}, 0.25)`)
+    r.style.setProperty('--athena-bg-base',        palette.bgBase)
+    r.style.setProperty('--athena-bg-surface',     palette.bgSurface)
+    r.style.setProperty('--athena-bg-panel',       palette.bgPanel)
+    r.style.setProperty('--athena-text-primary',   palette.textPrimary)
+    r.style.setProperty('--athena-text-secondary', palette.textSecondary)
   }, [palette])
 
   useEffect(() => {
@@ -288,6 +290,7 @@ export default function App() {
         earnedBadges={earnedBadges}
         streak={streak}
         orbState={orbState}
+        phaseLabel={palette.displayName}
       />
       <div className="app__body">
         <AthenaWidget

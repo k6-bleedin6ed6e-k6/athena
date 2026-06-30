@@ -13,7 +13,7 @@ function formatTime(date) {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
-export default function Taskbar({ currentView, onNavigate, currentWeek, totalXP, weekCompleted, weekTotal, completedLessons, earnedBadges, streak, orbState = 'idle' }) {
+export default function Taskbar({ currentView, onNavigate, currentWeek, totalXP, weekCompleted, weekTotal, completedLessons, earnedBadges, streak, orbState = 'idle', phaseLabel = '' }) {
   const [time, setTime] = useState(formatTime(new Date()))
   const [sound, setSound] = useState(isSoundEnabled())
 
@@ -57,6 +57,7 @@ export default function Taskbar({ currentView, onNavigate, currentWeek, totalXP,
           {sound ? '🔊' : '🔇'}
         </button>
         <span className="taskbar__time">{time}</span>
+        {phaseLabel && <span className="taskbar__phase">{phaseLabel}</span>}
         <ProgressTracker
           currentWeek={currentWeek}
           totalXP={totalXP}
