@@ -167,10 +167,12 @@ export default function AthenaWidget({ currentEvent, currentLesson, onEventHandl
 
     if (isSuccess) pulseOrb('success', 2000)
 
-    setMessages(prev => addMsg(prev, {
-      id: crypto.randomUUID(), type: 'system',
-      text: systemLabel(lesson, event), timestamp: Date.now(),
-    }))
+    if (lesson !== 'circadian') {
+      setMessages(prev => addMsg(prev, {
+        id: crypto.randomUUID(), type: 'system',
+        text: systemLabel(lesson, event), timestamp: Date.now(),
+      }))
+    }
 
     setIsTyping(true)
     ask({ lesson, event, context }).then(text => {
