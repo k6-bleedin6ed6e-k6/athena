@@ -86,26 +86,32 @@ function startFlushTimer() {
   flushTimer = setInterval(() => flush(learnerId), FLUSH_INTERVAL)
 }
 
-// Initialize on import — non-blocking
-;(async () => {
-  try {
-    if (!learnerId) {
+// No auto-run on import. This used to silently call identify() and start
+// flushing events for every visitor the moment this module loaded — no UI,
+// no disclosure, no opt-in. Found live in production 2026-07-14 (a real
+// D1 row got created from a single test probe). Contradicts the site's own
+// "privacy-first" framing and the README's "Athena works offline" claim,
+// which wasn't actually true while this ran. Left every function below
+// intact and exported — if cohort/dashboard tracking is genuinely wanted,
+// wire startSync() into an explicit, disclosed opt-in flow, not page load.
+export function startSync() {
+  if (learnerId) return
+  ;(async () => {
+    try {
       const passphrase = getOrCreatePassphrase()
       const result     = await identify(passphrase)
       learnerId = result.learner_id
       localStorage.setItem(LEARNER_ID_KEY, learnerId)
+      startFlushTimer()
+      await flush(learnerId)
+      window.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') flush(learnerId)
+      })
+    } catch {
+      // Offline or worker down — queue will persist and flush next session
     }
-    startFlushTimer()
-    // Flush any queued events from previous sessions
-    await flush(learnerId)
-    // Flush on page unload
-    window.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') flush(learnerId)
-    })
-  } catch {
-    // Offline or worker down — queue will persist and flush next session
-  }
-})()
+  })()
+}
 
 export function trackEvent(lesson, event, context = '') {
   enqueue({ lesson, event, context })
