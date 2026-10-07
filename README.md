@@ -155,6 +155,13 @@ Set keys in `.env.local` to enable live AI. Athena works fully offline without t
 
 No UI library dependencies. Every component is hand-rolled.
 
+## Visual identity
+
+Athena uses the Phosphor Noir graphite-violet surfaces across every circadian phase; the
+phase accent still moves through rose, ocean, amber, and iris. The desktop learning field
+uses the owner's optimized workshop artwork at `/images/athena-workbench.webp`, with a
+compact one-column layout on phones and open lesson rows instead of stacked slabs.
+
 ---
 
 ## Getting Started

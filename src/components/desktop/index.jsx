@@ -85,7 +85,7 @@ const BADGE_LABELS = {
 export default function Desktop({
   currentView, onBack,
   onOpenApp, onSelectLesson,
-  getLessonStatus, getEventProgress,
+  getLessonStatus,
   earnedBadges, totalXP, currentWeek, completedLessons,
   noPassphrase,
 }) {
@@ -285,6 +285,15 @@ export default function Desktop({
   return (
     <div className="desktop">
       <div className="desktop__content">
+        <header className="desktop__studio">
+          <img src="/images/athena-workbench.webp" alt="" aria-hidden="true" />
+          <div className="desktop__studio-copy">
+            <span>ATHENA · LEARNING STUDIO</span>
+            <h1>Learn by doing.</h1>
+          </div>
+          <span className="desktop__studio-mark" aria-hidden="true">A</span>
+        </header>
+
         {allDone ? (
           <div className="desktop__finished">
             <span className="desktop__finished-icon">🏆</span>
