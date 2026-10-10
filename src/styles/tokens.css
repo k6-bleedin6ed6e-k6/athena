@@ -1,13 +1,13 @@
 :root {
-  /* Phosphor Noir: charcoal-violet surfaces; copper, rose and moonstone light. */
-  --athena-bg-base: #111016;
-  --athena-bg-surface: #191720;
-  --athena-bg-panel: #211f2a;
+  /* Circadian surfaces: clear mineral light, with the phase accent intact. */
+  --athena-bg-base: #f2e8d5;
+  --athena-bg-surface: #fbf6eb;
+  --athena-bg-panel: #e6d8bd;
   --athena-gold: #e7a789;
   --athena-gold-dim: rgba(231, 167, 137, 0.11);
   --athena-gold-border: rgba(231, 167, 137, 0.24);
-  --athena-text-primary: #eeeaf2;
-  --athena-text-secondary: #aaa4b3;
+  --athena-text-primary: #302719;
+  --athena-text-secondary: #4a3a24;
   --athena-green: #91c9b2;
   --athena-radius-sm: 8px;
   --athena-radius-md: 12px;

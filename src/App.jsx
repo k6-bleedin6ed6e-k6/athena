@@ -136,6 +136,7 @@ export default function App() {
 
   useEffect(() => {
     const r = document.documentElement
+    r.style.colorScheme = 'light'
     r.style.setProperty('--athena-gold',           palette.gold)
     r.style.setProperty('--athena-gold-dim',       `rgba(${palette.goldRgb}, 0.15)`)
     r.style.setProperty('--athena-gold-border',    `rgba(${palette.goldRgb}, 0.25)`)
