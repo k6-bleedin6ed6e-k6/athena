@@ -21,7 +21,7 @@ import { playFanfare } from './utils/sound'
 import { LESSONS } from './utils/lessons'
 import CelebrationOverlay from './components/celebration'
 import AthenaWidget from './components/athena-widget'
-import { trackEvent, getPassphrase } from './utils/use-sync'
+import { trackEvent } from './utils/use-sync'
 import './app.css'
 
 function RestoreBanner({ onRestore, onDismiss }) {
@@ -136,7 +136,7 @@ export default function App() {
 
   useEffect(() => {
     const r = document.documentElement
-    r.style.colorScheme = 'light'
+    r.style.colorScheme = 'dark'
     r.style.setProperty('--athena-gold',           palette.gold)
     r.style.setProperty('--athena-gold-dim',       `rgba(${palette.goldRgb}, 0.15)`)
     r.style.setProperty('--athena-gold-border',    `rgba(${palette.goldRgb}, 0.25)`)

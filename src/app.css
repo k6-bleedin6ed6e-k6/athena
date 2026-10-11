@@ -228,7 +228,7 @@
 
 /* Accessible baseline across the workspace and its simulated screens. */
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-html, body { color-scheme: light; }
+html, body { color-scheme: dark; }
 body {
   font-size: clamp(16px, calc(15px + 0.2vw), 18px) !important;
   line-height: 1.55;
@@ -246,7 +246,7 @@ body :is(small, [class*="hint"], [class*="label"], [class*="caption"],
   line-height: 1.4;
 }
 
-/* Keep persistent prompts readable under the circadian light palette. */
+/* Keep persistent prompts readable across the circadian palette. */
 .app__restore-banner-btn,
 .app__save-banner-dismiss {
   border-color: var(--athena-gold-border);

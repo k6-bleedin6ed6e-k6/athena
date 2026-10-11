@@ -1,8 +1,8 @@
 const PHOSPHOR_NOIR_SURFACES = {
-  rose:  { bgBase: '#e9e0e7', bgSurface: '#f8f3f7', bgPanel: '#ded3df', textPrimary: '#2d222d', textSecondary: '#493b49' },
-  ocean: { bgBase: '#e3eff1', bgSurface: '#f5fafb', bgPanel: '#d5e5e8', textPrimary: '#1a2b30', textSecondary: '#2f454b' },
-  gold:  { bgBase: '#f2e8d5', bgSurface: '#fbf6eb', bgPanel: '#e6d8bd', textPrimary: '#302719', textSecondary: '#4a3a24' },
-  iris:  { bgBase: '#ece6f1', bgSurface: '#f8f5fb', bgPanel: '#ddd4e8', textPrimary: '#2b2534', textSecondary: '#443a51' },
+  rose:  { bgBase: '#15121c', bgSurface: '#211d29', bgPanel: '#2c2738', textPrimary: '#f0edf6', textSecondary: '#c4becf' },
+  ocean: { bgBase: '#10171d', bgSurface: '#18232b', bgPanel: '#25313a', textPrimary: '#e5eff2', textSecondary: '#b3c3c8' },
+  gold:  { bgBase: '#171713', bgSurface: '#222018', bgPanel: '#302b20', textPrimary: '#f1ebdc', textSecondary: '#c5bba0' },
+  iris:  { bgBase: '#15131c', bgSurface: '#211d2a', bgPanel: '#2e293a', textPrimary: '#efeaf5', textSecondary: '#c3b9d2' },
 }
 
 export const PHASES = {
